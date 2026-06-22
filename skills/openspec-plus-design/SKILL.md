@@ -1,0 +1,429 @@
+---
+name: openspec-plus-design
+description: "MANDATORY skill that activates whenever the OpenSpec design phase begins. Triggers: /opsx-new, /opsx-ff, or /opsx-continue runs; openspec-new-change, openspec-ff-change, openspec-continue-change, or openspec-explore is active; `openspec instructions design` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec design document."
+version: 1.0.0
+priority: high
+---
+
+# OpenSpec Plus Design
+
+## Mission
+
+Strengthen OpenSpec design with brainstorming patterns. Prevent premature architectural convergence — explore alternatives, compare tradeoffs, recommend, get user selection, build incrementally, validate vs proposal (and any existing spec) before writing design.md.
+
+---
+
+> **This skill is RIGID. Do NOT write any design file before all workflow phases complete through Phase 3 section approvals. After writing, reviewer subagent is MANDATORY — skipping review is a skill violation.**
+
+**Red flags — STOP, you are about to violate this skill:**
+
+- "There's only one obvious approach"
+- "I'll generate the full design and let the user review at the end"
+- "The user is in a hurry, I'll skip selection"
+- "I'll group all sections into one approval question"
+- "I have approval for the direction, so I can write the whole document now"
+- "The proposal (and spec, if it exists) is fresh, I don't need the reviewer subagent"
+- "Spec doesn't exist yet, I can sneak some requirements into the design"
+- "The design looks fine to me, I'll skip the reviewer subagent"
+- "Reviewer flagged minor issues, I'll re-dispatch after fixing to confirm"
+
+None justify skipping phases or pulling spec-level concerns into design.
+
+---
+
+## Inputs Available
+
+OpenSpec allows either order after proposal:
+
+* `proposal → spec → design` (spec exists)
+* `proposal → design → spec` (no spec yet)
+
+When this skill runs:
+
+* ALWAYS read approved proposal — authoritative for intent and capabilities
+* If spec exists, ALWAYS read it — design MUST align with it
+* If no spec yet, design works from proposal capabilities only — do NOT capture detailed requirements (that's spec phase, runs after design)
+* Design MUST align with proposal AND any existing spec
+
+---
+
+## Fast-Forward Mode (opsx-ff)
+
+When invoked from `/opsx-ff` (or user requests fast-forward / "keep momentum" / "skip questions"):
+
+* Skip Phase 1 alternatives exploration. Pick a single reasonable approach grounded in proposal, any existing spec, code-pattern context.
+* Skip Phase 2 user selection. Proceed with chosen approach directly.
+* Skip Phase 3 section-by-section approval. Generate sections end-to-end.
+* Run Phase 1 Project Context NORMALLY.
+* Run Phase 4 self-review NORMALLY.
+
+Document key decisions and tradeoffs inline so they're visible without explicit user approval.
+
+Pause only if Phase 4 self-review surfaces drift, or proposal/spec is critically ambiguous.
+
+Detection: `/opsx-ff` in conversation OR explicit FF keywords ("fast-forward", "skip questions", "keep momentum", "just create everything", "all artifacts", "no questions"). Normal continuation words ("continue", "go", "proceed", "next", "yes", "ok") do NOT trigger FF — requires explicit intent.
+
+---
+
+## Workflow
+
+Five phases. NEVER skip, merge, or reorder.
+
+```text
+Phase 0: Schema & Template Resolution
+Phase 1: Explore Design Approaches
+Phase 2: Select Design Direction
+Phase 3: Build Design Sections
+Phase 4: Generate Design
+```
+
+---
+
+## Workflow Visibility (MANDATORY)
+
+Display workflow phases via task tool at start; update as each phase completes.
+
+---
+
+## Core Principles
+
+## Explore Before Converging
+
+Never commit to first approach. Always explore alternatives.
+
+## User Owns The Final Direction
+
+Model recommends. User decides.
+
+## Build Design Collaboratively
+
+NEVER generate full design at once. Build incrementally, review each section with user.
+
+## Design Before Documentation
+
+Validate design — including alignment with proposal and any existing spec — before writing design.md.
+
+## YAGNI — Complexity Must Be Justified
+
+Every abstraction, layer, indirection MUST serve a real present need.
+
+## Improve, Don't Refactor
+
+Targeted improvements to existing code only when they serve the change. Never propose unrelated refactoring.
+
+## Respect Project Standards
+
+Read project instruction files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, equivalents) at Phase 1 start. Design MUST respect project conventions. Conflicts → surface to user, never silently override.
+
+## Use Stable Libraries Before Custom
+
+Survey ecosystem before proposing custom code. For each significant component (parsing, validation, HTTP, retries, scheduling, queuing, auth, crypto, dates, money, observability, etc.):
+
+1. Identify 2-3 candidate libraries
+2. Evaluate by: maintenance, stability (semver, breaking changes), popularity, license, security (CVEs, audits), compatibility (runtime, version, existing deps)
+3. Library fits → propose with rationale; don't write custom for the same purpose
+4. Choosing custom → justify why no library fits (domain-specific, license, dep tree, no maintained option, perf constraints unmet)
+
+Respect any approved-library list from project instruction files. Don't propose libraries the project rejected.
+
+### Human-In-The-Loop Approval For Library Choices
+
+Library choices have long-term consequences (lock-in, security surface, maintenance, transitive deps). For ANY new library introduction or replacement, surface to user via question tool:
+
+* 2-3 candidates evaluated
+* Recommended choice + rationale
+* Accepted tradeoffs (size, license, transitive deps)
+* Alternatives rejected + why
+
+Do NOT commit a library in the design until user approves.
+
+Libraries already in use by the project don't need re-approval.
+
+## Stay At Architecture Level
+
+Design captures HOW (architecture, patterns, integration). NEVER capture WHAT (detailed requirements, scenarios, acceptance criteria) — that's spec phase, even when spec runs after design.
+
+---
+
+## Phase 0: Schema & Template Resolution
+
+Run FIRST, before any exploration:
+
+```bash
+openspec instructions design --change <name> --json
+```
+
+Extract from response:
+- `template` — structural authority; sections you MUST fill
+- `instruction` — per-section guidance; what content each section needs
+- `rules` — project constraints to honor
+
+Parse template sections (H2/H3 headers + HTML comments). These are your **information requirements**. Phase 3 design concerns MUST produce enough substance to fill every template section. If the template has sections the hardcoded 5+1 concerns don't cover, add dynamic concerns during Phase 3.
+
+---
+
+## Phase 1: Explore Design Approaches
+
+**Pre-existing answers:** If recent conversation already covers architectural decisions, approaches discussed, constraints noted, or integration seams — via prior exploration, a detailed initial request, or any other source — incorporate those into your analysis and SKIP redundant clarification. Ask ONE question at a time only for genuinely unresolved areas. NEVER re-ask questions already answered in recent conversation.
+
+## Project Context
+
+Before generating approaches:
+
+1. **Project-level instruction files first** — `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, equivalents at project root, `.claude/`, `.opencode/`, `docs/`. These capture standards (tech stack, patterns, testing, architecture, naming). Design MUST respect them unless user approves deviation.
+2. Re-read approved proposal — always present (intent, capabilities, scope, non-goals).
+3. If spec exists, re-read it — design must align. If no spec yet, skip; spec phase runs after design and aligns with what we produce here.
+4. Read code referenced by those artifacts — design needs pattern-level knowledge.
+5. Note conventions, similar implementations, integration seams.
+
+Proposal answered "why" + capabilities. Spec (if present) answered "what". Project files answer "how this project does things". Design needs "how does the existing code look". Reuse, don't duplicate.
+
+If no spec exists and you find yourself defining detailed requirements, STOP — that's spec-phase work.
+
+---
+
+## Design Understanding
+
+Identify:
+
+* architectural decisions that must be made
+* areas where multiple solutions exist
+
+---
+
+## Clarification Questions
+
+Missing important info? Use question tool. ONE question at a time. Never batch. Wait for response. Continue until major ambiguities resolved.
+
+---
+
+## Generate Approaches
+
+Generate TWO OR THREE viable design approaches.
+
+Prefer two when only two meaningful directions exist. Three only when three materially different and realistic solutions exist. NEVER invent a weak approach to satisfy a count.
+
+Each approach MUST satisfy proposal capabilities. If spec exists, MUST also satisfy spec.
+
+For each approach provide: Approach Name, Core Idea, Advantages, Disadvantages, Complexity Level, Key Assumptions.
+
+Approaches must be meaningfully different. No cosmetic variations.
+
+---
+
+## Recommendation
+
+Recommend ONE approach. Explain why preferred, what tradeoffs accepted, why alternatives less suitable.
+
+Mark Phase 1 complete. Update task status.
+
+---
+
+## Phase 2: Select Design Direction
+
+Use question tool. Present all approaches. Mark recommended.
+
+Requirements:
+
+* Present all approaches
+* Mark recommended option
+* Ask exactly one selection question
+* Wait for user selection
+* Don't continue until choice made
+
+User may select any option. Two or three options.
+
+Mark Phase 2 complete. Update task status.
+
+---
+
+## Phase 3: Build Design Sections
+
+After direction selected, build incrementally. NEVER generate full design at once. Generate ONE section at a time. Scale each section to its complexity — simple concerns need a few sentences, complex ones several paragraphs; length serves clarity, never appearance of rigor.
+
+After each section, ask via question tool:
+
+```text
+Does this section look correct?
+
+A. Continue (Recommended)
+B. Revise Section
+C. Revisit Design Direction
+```
+
+Wait for response before proceeding.
+
+---
+
+## Design Section Rules
+
+Phase 3 "sections" are DESIGN CONCERNS walked one at a time with user approval — NOT the same as template sections (Phase 0). Phase 4 maps concerns into template sections.
+
+### Concrete Design Concerns (Phase 3 walk-through)
+
+Five + one conditional. Walk through each, get approval. Skip only if genuinely N/A.
+
+1. **Architecture** — shape, layers, boundaries, external integration points
+2. **Component Structure** — units, responsibilities, interfaces
+3. **Data Flow** — how data moves, where state lives, mutation ownership
+4. **Error Handling / Failure Modes** — what fails, propagation, retry, partial-failure, observability
+5. **Testing Approach** — design-level strategy: test pyramid (unit/integration/contract/e2e), environments, hard-to-test areas needing design accommodation, infrastructure, alignment with project standards from `AGENTS.md`/`CLAUDE.md`
+6. **Migration / Rollout** (when applicable) — rollout without breaking existing
+
+NEVER skip Error Handling or Testing for non-trivial changes. "Testing Approach" is DESIGN-level (what/where/infrastructure) — NOT test cases (→ spec Gherkin) or TDD ordering (→ implementor).
+
+### Mapping Concerns To Template
+
+Map concerns into template sections at write time (default `spec-driven` schema — adapt if template differs):
+
+| Phase 3 concern | Lands in template section |
+|---|---|
+| Architecture | Decisions (architecture choice + rationale) and any dedicated Architecture section |
+| Component Structure | Decisions (component breakdown + interfaces) |
+| Data Flow | Decisions (flow + state ownership) |
+| Error Handling / Failure Modes | Decisions (failure-handling strategy) and Risks (specific failure modes + mitigations) |
+| Testing Approach | Decisions (test boundary + infrastructure choices) |
+| Migration / Rollout | Migration Plan section |
+
+If the Phase 0 template has sections NOT covered by the 5+1 concerns above, add dynamic concerns during Phase 3 to collect substance for those sections. Walk them through with the user the same way.
+
+CONCERNS shape substance. TEMPLATE shapes structure.
+
+---
+
+## Section Refinement
+
+User requests changes? Revise current section, re-present, request approval again. Don't continue until current section accepted.
+
+---
+
+## Revisit Design Direction
+
+User chose "Revisit Design Direction"? Return to Phase 2. Allow another selection. Restart section generation.
+
+---
+
+## Proposal Or Spec Conflict
+
+Discover during section building that proposal — or existing spec, if present — is incomplete, contradictory, or wrong:
+
+STOP. Surface the issue. NEVER paper over with design choices.
+
+Resolutions:
+
+* If spec exists: revise design within current spec, revise spec, or revise proposal
+* If no spec: revise design within current proposal, revise proposal, or split into separate change
+
+Don't continue until conflict resolved.
+
+---
+
+## Section Completion
+
+Continue ONE section at a time until all required sections reviewed and accepted.
+
+**Rules compliance check:** Review `rules` from Phase 0. If any rule constrains design choices (e.g., "testing approach section is mandatory", "migration plan required for breaking changes"), verify the design sections honor those constraints. If a rule is violated, surface the conflict to the user before proceeding.
+
+Mark Phase 3 complete. Update task status.
+
+---
+
+## Phase 4: Generate Design
+
+## 4.1 Write Design Document
+
+Only after approaches explored, direction selected, and all sections reviewed/accepted.
+
+Final design must: reflect selected approach, incorporate approved refinements, preserve tradeoffs, align with proposal/spec, stay at architecture level. Use `template` and `outputPath` from Phase 0. Use template structure EXACTLY. Apply `instruction` and `rules` as constraints — do NOT copy them into the file.
+
+**Before writing — 3 mandatory steps:**
+
+**Step 1 — Capture:** Scan Phase 1-3 conversation. Extract every piece of information into a numbered capture list with FULL substance (not labels). Paste verbatim, do not paraphrase. Capture ONLY selected approach — rejected approaches are not output.
+
+**Step 2 — Map:** For each capture item, state which template section it maps to AND paste the content. Produce mapping before writing any artifact. Nothing left unmapped.
+
+**Step 3 — Density check:** Artifact must be at least as dense as the sum of Phase 1-3 discussions. Significantly shorter = information loss.
+
+Write from mapping. Do NOT discard any capture item.
+
+**CRITICAL — Missing or underrepresented information propagates as blind spots into tasks and implementation.** Every capture item must appear with full weight and specificity intact.
+
+Write to `outputPath` from Phase 0.
+
+---
+
+## 4.2 Artifact Compliance Review (MANDATORY — single-shot)
+
+Dispatch subagent of type `general` (use your subagent/task tool) with reviewer prompt below. Subagent loads written design.md, proposal, spec (if present) into its own context, returns structured findings list, exits.
+
+**Discipline:**
+
+* Single-shot — dispatch once, get findings, fix inline in root, surface for user review
+* NEVER re-dispatch after fixing
+* NEVER skip subagent because "design looks fine to me"
+* NEVER reload design/proposal/spec into root for review — defeats the purpose
+
+### Reviewer Subagent Prompt
+
+```
+You are a design document reviewer for an OpenSpec change. Verify the design is
+complete, consistent, and ready for user review.
+
+Inputs:
+- Design file: <DESIGN_PATH>
+- Proposal file: <PROPOSAL_PATH>
+- Spec file (path if exists, else "NONE"): <SPEC_PATH_OR_NONE>
+- Template: <TEMPLATE_CONTENT_FROM_PHASE_0>
+
+Read all inputs before reviewing. Check each category:
+
+| Category | What to look for |
+|---|---|
+| Proposal alignment | Every design decision traces to a proposal capability; no scope expansion; no relaxed non-goals; no contradictions |
+| Spec alignment (only if spec exists) | Every spec requirement addressed by design; no design decision contradicts a spec requirement; no design quietly redefines a spec term |
+| Scope drift | No design decision adds capabilities outside proposal scope; no design decision captures detailed requirements (those belong to spec phase) |
+| Architecture level | Design stays at HOW (architecture, patterns, integration) — never WHAT (detailed requirements, scenarios, acceptance criteria) |
+| Template compliance | Artifact sections match the provided template — no improvised, missing, or reordered sections |
+| Internal consistency | No two decisions that contradict each other |
+| Terminology consistency | Same concept named consistently throughout |
+| YAGNI | Every abstraction, layer, or indirection serves a real present need — no "for the future" |
+| Implementation leaks | No task lists, code snippets, WBS, or execution plans |
+| Testing Strategy | Layers, tooling choices, and boundary definitions are architectural decisions that belong in design and intentionally constrain the tasks phase. Flag only if specific test code, mock implementations, or file structure appear |
+| Rejected approaches | Design must contain ONLY the selected approach. If rejected/alternative approaches appear, flag — they belong in the decision process, not the output |
+| Placeholders | TBD, TODO, "[fill in]", incomplete sections |
+
+Calibration: only flag issues that would mislead the user during review or
+cause downstream phases to build the wrong thing. Minor wording improvements
+and stylistic preferences are NOT issues.
+
+Return format:
+
+Status: Approved | Issues Found
+
+Issues (if any):
+- [Category]: [specific finding] — [why it matters]
+
+Recommendations (advisory, do not block):
+- [optional improvement suggestions]
+```
+
+After receiving reviewer's response:
+
+* Status Approved → mark Phase 4 complete, surface design for user review
+* Status Issues Found → fix each Issue inline in root context, surface for user review (NEVER re-dispatch)
+
+Mark Phase 4 complete. Present final workflow completion.
+
+---
+
+## Anti-Patterns
+
+Implementation plans, WBS, estimates, code, deployment → later phases. Detailed requirements, scenarios, acceptance criteria → spec phase. Never produce either here.
+
+---
+
+## Success Criteria
+
+**Succeeds:** alternatives explored, tradeoffs considered, recommendation provided, user selected, sections reviewed individually, reviewer dispatched once with findings applied, design at architecture level.
+
+**Fails:** alternatives/selection/section-review skipped, full design at once, reviewer skipped/re-dispatched, requirements or implementation planning appears.

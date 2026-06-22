@@ -1,0 +1,14 @@
+schema: spec-driven
+
+context: |
+  MANDATORY: Invoke the 'openspec-plus-apply' skill immediately when openspec-apply-change is invoked
+
+rules:
+  proposal:
+    - "MANDATORY: Invoke the 'openspec-plus-proposal' skill BEFORE writing the proposal."
+  specs:
+    - "MANDATORY: Invoke the 'openspec-plus-spec' skill BEFORE writing any specification."
+  design:
+    - "MANDATORY: Invoke the 'openspec-plus-design' skill BEFORE writing the design document."
+  tasks:
+    - "MANDATORY: Invoke the 'openspec-plus-tasks' skill BEFORE writing the tasks file."
