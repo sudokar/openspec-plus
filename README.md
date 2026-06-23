@@ -169,6 +169,12 @@ If you prefer not to use the AI prompt:
 
 ---
 
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to open issues, suggest improvements, or submit pull requests.
+
+---
+
 ## 💛 Support
 
 If OpenSpec Plus is saving you time and improving your workflow, consider supporting its development:
