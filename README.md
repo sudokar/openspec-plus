@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <sub>Built with care for developers who believe in thinking before coding.</sub>
+  <sub>Built with care for developers who believe good software starts with good thinking.</sub>
 </p>
 
 <p align="center">
