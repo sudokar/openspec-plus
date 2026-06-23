@@ -22,7 +22,7 @@
 
 [OpenSpec](https://github.com/Fission-AI/OpenSpec) defines the workflow. OpenSpec Plus enforces the structure and discipline. It's designed to fit into the existing OpenSpec workflow rather than replace it.
 
-| Phase | What it brings |
+| Phase | Why it matters |
 |---|---|
 | 🔍 **Proposal** | Right problem scoped before any solution work begins |
 | 📋 **Spec** | Unambiguous requirements with testable acceptance scenarios |
