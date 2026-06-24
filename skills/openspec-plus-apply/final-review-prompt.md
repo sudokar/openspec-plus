@@ -6,7 +6,7 @@ Dispatch the whole-change reviewer subagent at Phase 3 (after all slices `[x]`, 
 
 **Out of scope:** spec/design alignment (that's `openspec-verify-change`, run manually by user). This reviewer focuses on whether slices fit together as one coherent change.
 
-**Reviewer reads everything itself.** The controller passes artifact paths and `BASE_SHA` / `HEAD_SHA`. The reviewer opens the artifacts and runs `git diff` in its isolated subagent context. The controller has NOT pre-read the diff or the artifacts beyond what vanilla already loaded.
+**Reviewer reads everything itself.** Controller passes artifact paths and all changed file paths. Reviewer opens artifacts and runs `git diff HEAD`; falls back to reading files directly if git unavailable. Controller has NOT pre-read the diff or artifacts beyond what vanilla loaded.
 
 ---
 
@@ -34,14 +34,14 @@ Dispatch subagent of type general (use your subagent/task tool):
     * Design: {DESIGN_PATH}
     * Tasks (all `[x]`): {TASKS_PATH}
 
-    ## Diff Range
+    ## Diff
 
-    BASE_SHA: {BASE_SHA}
-    HEAD_SHA: {HEAD_SHA}
+    Changed files (all slices combined): {CHANGED_FILE_PATHS}
 
-    Run `git diff {BASE_SHA} {HEAD_SHA}` yourself. The controller has
-    NOT pre-read the diff. Read the entire diff. This is the cumulative
-    output of every slice.
+    Run `git diff HEAD -- {CHANGED_FILE_PATHS}` yourself. Controller
+    has NOT pre-read the diff. Read the entire diff — cumulative
+    output of every slice. If git is unavailable, read each file
+    directly and note the fallback in your report.
 
     ## What To Check
 

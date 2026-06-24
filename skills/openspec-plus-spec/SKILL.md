@@ -1,7 +1,7 @@
 ---
 name: openspec-plus-spec
 description: "MANDATORY skill that activates whenever the OpenSpec specification phase begins. Triggers: /opsx-new, /opsx-ff, or /opsx-continue runs; openspec-new-change, openspec-ff-change, openspec-continue-change, or openspec-explore is active; `openspec instructions spec` or `openspec instructions specs` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec specification."
-version: 1.0.0
+version: 1.0.1
 priority: high
 ---
 
@@ -325,6 +325,11 @@ Read all inputs before reviewing. Check each category:
 Calibration: only flag issues that would mislead the user during review or
 that would cause downstream phases to build the wrong thing. Minor wording
 improvements and stylistic preferences are NOT issues.
+
+Scenario keyword format (GIVEN/WHEN/THEN/AND/BUT) is defined by the skill,
+not the template. If the template uses a simpler format (e.g., WHEN/THEN
+only), the skill's format takes precedence — do NOT flag this as a template
+compliance issue or scenario format issue.
 
 Return format:
 

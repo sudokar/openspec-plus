@@ -1,7 +1,7 @@
 ---
 name: openspec-plus-apply
 description: "MANDATORY skill that activates whenever the OpenSpec apply phase begins. Triggers: /opsx-apply runs, the openspec-apply-change vanilla skill is referenced or active, `openspec instructions apply` is invoked, or the user asks to implement, apply, execute, or build out an OpenSpec change ('implement the change', 'apply tasks', 'execute change', 'build out the change'). Takes over only vanilla step 6 (implementation loop) and emulates step 7 output (final status)."
-version: 1.0.0
+version: 1.0.1
 priority: high
 ---
 
@@ -114,8 +114,8 @@ In subagent mode, the controller NEVER reads slice's affected source files — p
 
 * Implementer: pass affected file paths. Implementer reads them.
 * Spec-compliance reviewer: pass paths to changed files. Reviewer reads them.
-* Code-quality reviewer: pass `BASE_SHA` and `HEAD_SHA`. Reviewer runs `git diff` itself.
-* Final reviewer: pass artifact paths and SHA range. Reviewer reads them.
+* Code-quality reviewer: pass changed file paths. Reviewer diffs via `git diff HEAD`; falls back to reading files if git unavailable.
+* Final reviewer: pass artifact paths + all changed file paths. Same diff strategy.
 
 Artifacts (`proposal.md`, `spec.md`, `design.md`, `tasks.md`) are already in main context from vanilla — using them for subagent prompt excerpts is fine. Source code files are NOT.
 
@@ -324,7 +324,7 @@ Returns ✅ Compliant OR ❌ Issues: `Task-Incomplete`, `Missing-Requirement`, `
 
 #### 2.A.4 Code-Quality Review
 
-ONLY after spec-compliance ✅. Dispatch using `./code-quality-reviewer-prompt.md`. Pass: slice description, tasks + requirements, `BASE_SHA`/`HEAD_SHA`, paths to project standards docs. Reviewer runs `git diff` and reads standards docs independently.
+ONLY after spec-compliance ✅. Dispatch using `./code-quality-reviewer-prompt.md`. Pass: slice description, tasks + requirements, changed file paths, project standards doc paths. Reviewer diffs via `git diff HEAD` (no git → reads files directly) and reads standards docs independently.
 
 Applies implementation principles + code-quality concerns + project-rule compliance. Returns Strengths / Issues (Critical/Important/Minor) / Assessment. ❌ → implementer fixes → re-review. Cap 3 cycles → STOP, pause and exit.
 
@@ -411,9 +411,9 @@ Each pause exits Phase 2, surfaces context, suggests plus-* update.
 
 ### 3.1 Whole-Change Code Review
 
-After all slices `[x]`: `BASE_SHA` = Phase 2 start, `HEAD_SHA` = current.
+After all slices `[x]`:
 
-Dispatch using `./final-review-prompt.md`. Pass: change name/schema, paths to all artifacts, SHA range. Main agent does NOT pre-read the diff. Reviewer verifies cross-slice integration, surfaces design issues (advisory), applies principles whole-change. Does NOT do spec/design alignment (that's `openspec-verify-change`).
+Dispatch using `./final-review-prompt.md`. Pass: change name/schema, all artifact paths, all changed file paths. Main agent does NOT pre-read the diff. Reviewer diffs via `git diff HEAD` (no git → reads files directly). Verifies cross-slice integration, surfaces design issues (advisory), applies principles whole-change. Does NOT do spec/design alignment (that's `openspec-verify-change`).
 
 Issues: small/local → fix inline; large/cross-slice → re-dispatch implementer. Cap 3 cycles → STOP, pause and exit.
 
