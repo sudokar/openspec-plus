@@ -6,7 +6,7 @@ Dispatch a code-quality reviewer subagent for an OpenSpec change slice.
 
 **Order:** Dispatch ONLY after spec-compliance reviewer returns ✅. Never run code-quality before spec-compliance is clean.
 
-**Reviewer reads the diff itself.** The controller passes only `BASE_SHA` and `HEAD_SHA`. The reviewer runs `git diff BASE_SHA HEAD_SHA` in its isolated subagent context. The controller has NOT pre-read the diff.
+**Reviewer reads the diff itself.** Controller passes changed file paths. Reviewer runs `git diff HEAD` in its isolated context; falls back to reading files directly if git unavailable. Controller has NOT pre-read the diff.
 
 ---
 
@@ -28,14 +28,14 @@ Dispatch subagent of type general (use your subagent/task tool):
 
     Relevant spec requirements: {SPEC_REQUIREMENTS}
 
-    ## Diff Range
+    ## Diff
 
-    BASE_SHA: {BASE_SHA}
-    HEAD_SHA: {HEAD_SHA}
+    Changed files: {CHANGED_FILE_PATHS}
 
-    Run `git diff {BASE_SHA} {HEAD_SHA}` yourself in this isolated
-    subagent context. The controller has NOT pre-read the diff. Read
-    the diff carefully. Every claim references actual code.
+    Run `git diff HEAD -- {CHANGED_FILE_PATHS}` yourself. Controller
+    has NOT pre-read the diff. Read carefully; every claim must
+    reference actual code. If git is unavailable, read each file
+    directly and note the fallback in your report.
 
     ## Project Standards Documents (Read Independently)
 
