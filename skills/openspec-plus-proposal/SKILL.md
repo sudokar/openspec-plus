@@ -1,7 +1,7 @@
 ---
 name: openspec-plus-proposal
 description: "MANDATORY skill that activates whenever the OpenSpec proposal phase begins. Triggers: /opsx-new, /opsx-ff, or /opsx-continue runs; openspec-new-change, openspec-ff-change, openspec-continue-change, or openspec-explore is active; `openspec instructions proposal` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec proposal."
-version: 1.0.0
+version: 1.1.0
 priority: high
 disable-user-invocation: true
 ---
