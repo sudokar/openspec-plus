@@ -9,7 +9,6 @@ Dispatch an implementer subagent for one OpenSpec change slice.
 * NEVER make subagent read `tasks.md` — paste full slice text below.
 * NEVER inherit session history — subagent gets ONLY this prompt.
 * Track NEEDS_CONTEXT count per slice — 3+ in a row escalates to user (artifact gap).
-* Mark `[x]` is the controller's job. Subagent reports completion; controller marks after all gates pass.
 
 ---
 
@@ -105,17 +104,10 @@ Dispatch subagent of type general (use your subagent/task tool):
 
     Apply throughout:
 
-    1. **Think Before Coding** — surface assumptions, ASK if a scenario
-       or requirement is ambiguous. Don't silently pick between
-       interpretations.
-    2. **Simplicity First** — minimum code that makes each test pass.
-       No speculative abstractions, no flexibility the scenario didn't
-       ask for, no error handling for impossible cases.
-    3. **Surgical Changes** — every changed line traces to a slice
-       task. No improving adjacent code, no refactoring unrelated
-       formatting, no deleting pre-existing dead code.
-    4. **Goal-Driven Execution** — each Gherkin scenario is a
-       verifiable goal. Loop RED → GREEN → REFACTOR until clean.
+    1. **Think Before Coding** — surface assumptions, ASK if ambiguous; never silently pick between interpretations.
+    2. **Simplicity First** — minimum code per test; no speculative abstractions, no flexibility the scenario didn't ask for.
+    3. **Surgical Changes** — every changed line traces to a slice task; no adjacent improvements or unrelated reformatting.
+    4. **Goal-Driven Execution** — each Gherkin scenario is the verifiable goal; loop RED→GREEN→REFACTOR until clean.
 
     ## Step 3 — Code Style: Code As Documentation
 
@@ -123,7 +115,6 @@ Dispatch subagent of type general (use your subagent/task tool):
 
     * Self-documenting code — names describe intent, functions do one thing, structure makes flow obvious
     * Comments only for: genuinely non-obvious algorithms, external-constraint workarounds, counter-intuitive tradeoffs
-    * Refactor before commenting — if better naming/structure removes the need, do that first
     * Never describe obvious behavior in comments; never leave commented-out code, TODO, FIXME
     * Match existing patterns; testable, readable, maintainable
 
@@ -158,10 +149,8 @@ Dispatch subagent of type general (use your subagent/task tool):
 
     ### Critical Anti-Pattern
 
-    Your instinct is to batch. Test 1 correct then tests 2..N
-    batched is STILL a violation — the cycle applies to EVERY test.
-    If you catch yourself batching → STOP, delete, restart from
-    next single test.
+    Your instinct is to batch. Test 1 correct then tests 2..N batched is STILL a violation.
+    If you catch yourself batching → STOP, delete, restart from next single test.
 
     ## Step 5 — Pre-Mark Gate
 
@@ -200,9 +189,7 @@ Dispatch subagent of type general (use your subagent/task tool):
 
     ## When You Are In Over Your Head
 
-    Bad work is worse than no work. Report BLOCKED when: multiple valid
-    architectural approaches and design doesn't pick one, ambiguous Gherkin,
-    spec/design contradiction, spec/design modification required, or no progress.
+    Report BLOCKED when: multiple valid architectural approaches and design doesn't pick one, ambiguous Gherkin, spec/design contradiction, spec/design modification required, or no progress.
 
     ## Report Format
 
@@ -237,17 +224,3 @@ Dispatch subagent of type general (use your subagent/task tool):
     Use DONE_WITH_CONCERNS instead of silently producing work you're
     unsure about. Use BLOCKED instead of guessing.
 ```
-
----
-
-## Status Handling Reference (controller side)
-
-| Status | Controller action |
-|---|---|
-| DONE | Proceed to spec-compliance review |
-| DONE_WITH_CONCERNS | Read concerns. Correctness/scope → address before review. Otherwise note + proceed. |
-| NEEDS_CONTEXT | Provide missing context, re-dispatch same model. 3+ in a row → escalate (fundamental gap) |
-| BLOCKED `context` | Provide more context, re-dispatch same model |
-| BLOCKED `reasoning` | Re-dispatch with capable model |
-| BLOCKED `too-large` | Break slice into per-task subagents |
-| BLOCKED `fundamental` | Pause and exit, suggest plus-design / plus-spec |

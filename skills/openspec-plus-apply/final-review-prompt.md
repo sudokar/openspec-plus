@@ -4,9 +4,7 @@ Dispatch the whole-change reviewer subagent at Phase 3 (after all slices `[x]`, 
 
 **Purpose:** Review entire change end-to-end as one diff — verify cross-slice integration, surface design issues revealed by implementation, apply implementation principles at change scope.
 
-**Out of scope:** spec/design alignment (that's `openspec-verify-change`, run manually by user). This reviewer focuses on whether slices fit together as one coherent change.
-
-**Reviewer reads everything itself.** Controller passes artifact paths and all changed file paths. Reviewer opens artifacts and runs `git diff HEAD`; falls back to reading files directly if git unavailable. Controller has NOT pre-read the diff or artifacts beyond what vanilla loaded.
+**Out of scope:** spec/design alignment (that's `openspec-verify-change`). **Reviewer reads everything itself** — controller passes artifact paths and all changed file paths; reviewer opens artifacts and runs `git diff HEAD`, falling back to reading files directly if git unavailable.
 
 ---
 
@@ -56,10 +54,10 @@ Dispatch subagent of type general (use your subagent/task tool):
 
     Apply at WHOLE change, not individual slices:
 
-    1. **Surgical** — every line traces to task/requirement; no cross-slice scope creep
-    2. **Simplicity** — no emergent abstractions/config/error handling beyond what slices require
-    3. **Goal-Driven** — every Gherkin scenario has a passing test
-    4. **Think First** — cross-slice integration choices surfaced, not silently assumed
+    1. **Surgical** — every line traces to task/requirement; no cross-slice scope creep.
+    2. **Simplicity** — no emergent abstractions/config/error handling beyond what slices require.
+    3. **Goal-Driven** — every Gherkin scenario has a passing test.
+    4. **Think First** — cross-slice integration choices surfaced, not silently assumed.
 
     ### Implementation-Reveals-Design-Issue
 
@@ -122,6 +120,4 @@ Dispatch subagent of type general (use your subagent/task tool):
 | 1-2 | Fix Critical + Important issues. Small/local: fix inline; large/cross-slice: re-dispatch implementer for affected slices. Re-dispatch this reviewer. |
 | 3 | STOP. Pause and exit. Cross-slice integration problems warrant artifact-level attention. |
 
-After this reviewer ✅, run the final cumulative gate (lint + format + tests + other on ALL files affected by ALL slices). Gate fails after 3 fix cycles → also pause and exit.
-
-Implementation-reveals-design-issue findings are advisory — surface in hand-back output but don't block. User decides whether to update artifacts before `/opsx-archive` or accept the gap.
+After this reviewer ✅, run the final cumulative gate (lint + format + tests + other on ALL files affected by ALL slices). Gate fails after 3 fix cycles → pause and exit.

@@ -3,6 +3,7 @@ name: openspec-plus-tasks
 description: "MANDATORY skill that activates whenever the OpenSpec tasks phase begins. Triggers: /opsx-new, /opsx-ff, or /opsx-continue runs; openspec-new-change, openspec-ff-change, openspec-continue-change, or openspec-explore is active; `openspec instructions tasks` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec tasks.md file."
 version: 1.0.0
 priority: high
+disable-user-invocation: true
 ---
 
 # OpenSpec Plus Tasks
@@ -31,8 +32,6 @@ Two anchors that shape every task group:
 - "Reviewer flagged minor issues, I'll re-dispatch after fixing to confirm"
 - "I'll add commit instructions per task"
 - "Let me write a TDD-ordered set of sub-tasks"
-
-None justify horizontal slicing, untestable groups, format restructuring, code reading, skipping/re-dispatching the reviewer, or pulling implementation discipline into this phase.
 
 ---
 
@@ -83,33 +82,13 @@ Display workflow phases via task tool at start; update as each phase completes.
 
 ## Core Principles
 
-### Vertical Slice Per Group
-
-Each `## N. <Group Name>` heading is one vertical slice — a feature or capability that, when complete, produces a testable outcome end-to-end. NOT a layer (DB, API, UI). NOT a phase (setup, build, polish). NOT a category (tests, docs, config). Each group spans whatever layers are needed to deliver one slice of value.
-
-### Testable Outcome Per Group
-
-After the last `- [ ]` in a group is checked, the user can verify something works in one sentence. If a group cannot produce a testable outcome, merge it with the slice that completes the outcome, or surface as a design gap.
-
-### Verifiable Tasks
-
-Each task small enough that "done" is unambiguous. No "implement appropriately". No "handle edge cases". No "make it work". Reader knows exactly when finished.
-
-### Dependency Order Across Slices
-
-Slices may depend on each other. Order so each slice's prerequisites are satisfied by earlier slices. Within-slice dependencies are managed by task ordering inside the group.
-
-### YAGNI — No Speculative Tasks
-
-Every task traces to a spec requirement, design decision, or stakeholder need.
-
-### Respect Project Standards
-
-Read project instruction files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, equivalents) at Phase 1 start. Tasks MUST follow project conventions (paths, naming, structure). Conflicts → surface to user, never silently override.
-
-### Implementation Discipline Belongs Elsewhere
-
-This skill produces a clean, sliced, verifiable task list. Nothing more.
+- **Vertical Slice Per Group** — each `## N.` heading is one vertical slice (feature/capability that produces a testable end-to-end outcome), NOT a layer (DB/API/UI), NOT a phase (setup/build/polish), NOT a category (tests/docs/config).
+- **Testable Outcome Per Group** — after the last `- [ ]` in a group is checked, the user can verify something works in one sentence; if not, merge with the slice that completes the outcome or surface as a design gap.
+- **Verifiable Tasks** — each task small enough that "done" is unambiguous; no "implement appropriately", "handle edge cases", "make it work".
+- **Dependency Order Across Slices** — order so each slice's prerequisites are satisfied by earlier slices; within-slice dependencies managed by task ordering inside the group.
+- **YAGNI — No Speculative Tasks** — every task traces to a spec requirement, design decision, or stakeholder need.
+- **Respect Project Standards** — read project instruction files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, equivalents) at Phase 1 start; tasks MUST follow project conventions (paths, naming, structure); conflicts → surface to user, never silently override.
+- **Implementation Discipline Belongs Elsewhere** — this skill produces a clean, sliced, verifiable task list; nothing more.
 
 ---
 
@@ -148,17 +127,11 @@ NEVER read source code. If grounding is missing, the design is incomplete — su
 
 From spec requirements and design components, identify slices that deliver testable outcomes. Each slice spans whatever layers (DB, API, UI, CLI, background jobs) are needed.
 
-For each candidate slice ask: "When all tasks in this group are done, what can the user observe or verify?"
-
-If "nothing observable", it's not a slice — it's a layer or scaffolding. Re-slice or merge.
+For each candidate slice ask: "When all tasks in this group are done, what can the user observe or verify?" If "nothing observable", it's not a slice — re-slice or merge.
 
 ### 3. Name The Testable Outcome For Each Slice
 
-For each slice, write the testable outcome in one plain sentence. Examples:
-
-* "User can log in with email/password and see the dashboard"
-* "Admin can export user metrics as a CSV file via the export button"
-* "Background job processes pending invoices once per hour"
+For each slice, write the testable outcome in one plain sentence. Example: "User can log in with email/password and see the dashboard".
 
 Cannot name in one sentence? The slice is wrong — re-slice or surface a design gap.
 
@@ -172,8 +145,6 @@ If slicing is ambiguous, use **question tool**, ONE question at a time:
 
 * "Which capability should be the first vertical slice?"
 * "Is X part of slice A, or its own slice?"
-* "What's the minimal testable outcome for slice A?"
-* "Does slice B depend on slice A, or are they independent?"
 
 NEVER batch. NEVER assume.
 
@@ -191,17 +162,15 @@ Mark Phase 1 complete. Update task status. Proceed to Phase 2.
 
 Use the `template` and `outputPath` from Phase 0. Use the structure exactly. Do not restructure, add sections, or change numbering convention.
 
-**Before writing — 3 mandatory steps:**
+**Before writing — 2 mandatory steps:**
 
-**Step 1 — Capture:** Scan Phase 1 conversation. Extract every piece of information into a numbered capture list with FULL substance (not labels). Paste verbatim, do not paraphrase.
+**Step 1 — Map Phase 1 slices to template:** Phase 1 slices and task descriptions are in context — use them directly. Do NOT extract, summarize, or rephrase. Map each slice and its tasks to the corresponding `## N.` group. Nothing left unmapped.
 
-**Step 2 — Map:** For each capture item, state which slice group (`## N.`) it maps to AND paste the content. Produce mapping before writing. Nothing left unmapped.
+**Step 2 — Density check:** Tasks must be at least as dense as Phase 1. Significantly shorter = information loss.
 
-**Step 3 — Density check:** Tasks must be at least as dense as Phase 1 discussions. Significantly shorter = information loss.
+Write from the mapping. Do NOT discard any Phase 1 slice or task.
 
-Write from mapping. Do NOT discard any capture item.
-
-**CRITICAL — Missing or underrepresented information becomes missing or wrong work in implementation.** Every capture item must appear with full weight intact.
+**CRITICAL — Missing or underrepresented information becomes missing or wrong work in implementation.** Every Phase 1 slice must appear with full weight intact.
 
 Following the template from Phase 0, write:
 

@@ -6,7 +6,7 @@ Dispatch a code-quality reviewer subagent for an OpenSpec change slice.
 
 **Order:** Dispatch ONLY after spec-compliance reviewer returns ✅. Never run code-quality before spec-compliance is clean.
 
-**Reviewer reads the diff itself.** Controller passes changed file paths. Reviewer runs `git diff HEAD` in its isolated context; falls back to reading files directly if git unavailable. Controller has NOT pre-read the diff.
+**Reviewer reads the diff itself.** Controller passes changed file paths; reviewer runs `git diff HEAD` in its isolated context, falling back to reading files directly if git unavailable.
 
 ---
 
@@ -39,30 +39,13 @@ Dispatch subagent of type general (use your subagent/task tool):
 
     ## Project Standards Documents (Read Independently)
 
-    These are the project's source of truth for HOW code should be
-    written — code style, file organization, naming, testing
-    conventions, lint/format/test commands, framework idioms, and any
-    other conventions the team has documented. Each team configures
-    their project differently; these files are the contract.
+    The project's source of truth for code style, file organization, naming, testing conventions, lint/format/test commands, and framework idioms.
 
     {STANDARDS_DOC_PATHS}
 
-    Open and read each one. Follow references inside (e.g., if
-    `AGENTS.md` / `CLAUDE.md` / `GEMINI.md` says "see
-    `docs/coding-standards.md`" or "testing conventions in
-    `CONTRIBUTING.md`" — read those too).
+    Open and read each one, including referenced docs (e.g., `AGENTS.md` links to `docs/coding-standards.md` — read that too).
 
-    The implementer was required to follow every documented rule
-    strictly. Your job (alongside the generic code-quality concerns
-    below) is to verify the implementation honors every rule that
-    applies to the code/tests this slice produced.
-
-    Note on division of labor: the **spec-compliance reviewer**
-    already verified that the implementation matches the OpenSpec
-    contract (proposal scope, spec requirements, Gherkin scenarios,
-    design decisions, design file structure). You do NOT re-check
-    those. You focus on code quality — including compliance with the
-    project's standards docs above.
+    The implementer was required to follow every documented rule strictly. Verify the implementation honors every applicable rule.
 
     ## What To Check
 
@@ -83,46 +66,23 @@ Dispatch subagent of type general (use your subagent/task tool):
 
     Implementation principles concerns:
 
-    * **Surgical Changes** — every changed line traces to a slice task?
-      Adjacent code refactored, reformatted, or "improved" without
-      being asked? Imports/variables/functions removed that were not
-      made unused by THIS slice?
-    * **Simplicity First** — abstractions for single-use code?
-      Configurability slice didn't request? Error handling for
-      impossible cases? Would a senior engineer call this
-      overcomplicated?
-    * **No Speculative Features** — anything beyond what slice tasks
-      and Gherkin scenarios required?
+    * **Surgical Changes** — every changed line traces to a slice task? Adjacent code refactored without being asked?
+    * **Simplicity First** — abstractions for single-use code? Configurability slice didn't request? Would a senior engineer call this overcomplicated?
+    * **No Speculative Features** — anything beyond what slice tasks and Gherkin scenarios required?
 
     Code-style concerns:
 
-    * **Comments** — comments on non-complex logic are noise; flag
-      them. Comment explaining genuinely non-obvious algorithmic
-      shortcut or tradeoff is useful; don't flag.
-    * **Comments — refactor first** — if a comment exists, ask: could
-      a better name, smaller function, or clearer structure remove
-      the need for it? If yes, flag as Important — refactor first
-      is the rule.
-    * **Testability** — would this code be hard to test? Hard-to-test
-      = hard-to-use, usually a sign of coupling.
+    * **Comments** — comments on non-complex logic are noise; flag them. If a comment exists, ask: could a better name/structure remove it? If yes, flag as Important (refactor-first rule).
+    * **Testability** — hard to test = hard to use, usually a sign of coupling.
     * **Readability** — does each function fit one mental load?
-    * **Maintainability** — would a new contributor understand the
-      slice's code shape in a few minutes?
-    * **No commented-out code, no TODO, no FIXME, no "explained
-      later" markers.**
+    * **Maintainability** — would a new contributor understand the slice's code shape in a few minutes?
+    * **No commented-out code, no TODO, no FIXME, no "explained later" markers.**
 
     Project standards compliance (MANDATORY):
 
-    Read every rule in the project standards docs above. Verify the
-    implementation honors each applicable rule — naming, structure,
-    framework idioms, testing conventions, type annotations, file
-    placement, etc. Cherry-picking is itself a violation — flag each
-    ignored rule. Cite source doc for each violation (e.g.,
-    "AGENTS.md §Naming: `usrCtrl` should be `userController`").
+    Read every rule in the project standards docs. Verify the implementation honors each applicable rule — naming, structure, framework idioms, testing conventions, type annotations, file placement. Cherry-picking is itself a violation. Cite source doc for each violation (e.g., "AGENTS.md §Naming: `usrCtrl` should be `userController`").
 
-    Severity: **Important** for most violations; **Critical** only
-    when the rule breaks the build; **Minor** for "should"-level
-    stylistic rules.
+    Severity: **Important** for most violations; **Critical** only when the rule breaks the build; **Minor** for "should"-level stylistic rules.
 
     ## Calibration
 

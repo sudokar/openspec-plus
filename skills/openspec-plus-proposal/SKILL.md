@@ -3,6 +3,7 @@ name: openspec-plus-proposal
 description: "MANDATORY skill that activates whenever the OpenSpec proposal phase begins. Triggers: /opsx-new, /opsx-ff, or /opsx-continue runs; openspec-new-change, openspec-ff-change, openspec-continue-change, or openspec-explore is active; `openspec instructions proposal` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec proposal."
 version: 1.0.0
 priority: high
+disable-user-invocation: true
 ---
 
 # OpenSpec Plus Proposal
@@ -58,15 +59,11 @@ Display workflow phases via task tool at start; update as each phase completes.
 
 ## Core Principles
 
-**Understand Before Defining.** Seek the problem before describing the change. Never jump to proposed solutions.
-
-**Goals Before Solutions.** Solution language ("add Redis", "use Postgres") → redirect to the underlying problem and goal.
-
-**Scope Boundaries Are Critical.** Non-goals as deliberate as in-scope items. Strong non-goals reduce future scope creep.
-
-**YAGNI — No Speculative Scope.** Every scope item traces to a stated user need or stakeholder concern.
-
-**Respect Project Standards.** Read project instruction files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, equivalents) at Phase 1 start. Use project terminology. Conflicts → surface to user, never silently override.
+- **Understand Before Defining** — seek the problem before describing the change; never jump to proposed solutions.
+- **Goals Before Solutions** — solution language ("add Redis", "use Postgres") → redirect to the underlying problem and goal.
+- **Scope Boundaries Are Critical** — non-goals as deliberate as in-scope items; strong non-goals reduce future scope creep.
+- **YAGNI — No Speculative Scope** — every scope item traces to a stated user need or stakeholder concern.
+- **Respect Project Standards** — read project instruction files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, equivalents) at Phase 1 start; use project terminology; conflicts → surface to user, never silently override.
 
 ---
 
@@ -74,11 +71,13 @@ Display workflow phases via task tool at start; update as each phase completes.
 
 **Run FIRST, before Phase 0. Skip if already run this session.**
 
-1. Check `openspec/.plus/last-update-check` — if missing or older than 7 days:
-   - Fetch `https://raw.githubusercontent.com/sudokar/openspec-plus/main/VERSION`
-   - Compare with `openspec/.plus/VERSION` (local)
-   - If remote > local → display: `🔔 OpenSpec Plus update available (v{remote} → you have v{local}). Run install prompt: https://github.com/sudokar/openspec-plus#install--update`
-   - Write timestamp to `openspec/.plus/last-update-check`
+1. Read `openspec/.plus/last-update-check`:
+   - File exists AND timestamp is within 7 days of today → **skip immediately, proceed to Phase 0**
+   - Missing or older than 7 days → continue:
+     - Fetch `https://raw.githubusercontent.com/sudokar/openspec-plus/main/VERSION`
+     - Compare with `openspec/.plus/VERSION` (local)
+     - If remote > local → display: `🔔 OpenSpec Plus update available (v{remote} → you have v{local}). Run install prompt: https://github.com/sudokar/openspec-plus#install--update`
+     - Write current timestamp to `openspec/.plus/last-update-check`
 2. Network/file errors → silently continue. Notification only — do NOT auto-install.
 
 Mark Phase -1 complete, proceed to Phase 0.
@@ -125,13 +124,12 @@ Use the **question tool**, ONE question at a time. Cover these lenses until each
 
 NEVER batch questions. NEVER assume answers. Mark a recommended option "(Recommended)" when defaults exist.
 
-**Mid-discovery scope check:** After all lenses answered, re-evaluate — did scope grow beyond a single cohesive change during Q&A? If lenses now describe multiple independent subsystems, decompose before writing.
+Once all five lenses answered, summarize for the user before writing: problem (one sentence), outcome (one sentence), in-scope capabilities, non-goals, impact areas.
 
-**Template coverage check:** Verify every template section (from Phase 0) has collected substance to fill it. If any section lacks substance, ask targeted questions until covered.
-
-**Rules compliance check:** Review `rules` from Phase 0. If any rule constrains what can be proposed (e.g., "proposals must include impact assessment", "non-goals section is mandatory"), verify the lenses honor those constraints. If a rule is violated, surface the conflict to the user before writing.
-
-Once all five lenses answered, template coverage verified, and rules compliance checked, summarize for the user before writing: problem (one sentence), outcome (one sentence), in-scope capabilities, non-goals, impact areas.
+**Phase 1 Complete Checks:**
+- **Mid-discovery scope check:** re-evaluate — did scope grow beyond a single cohesive change during Q&A? If so, decompose before writing.
+- **Template coverage check:** verify every template section (from Phase 0) has collected substance to fill it; ask targeted questions if any section lacks substance.
+- **Rules compliance check:** review `rules` from Phase 0; if any rule constrains what can be proposed, surface the conflict to the user before writing.
 
 ---
 
@@ -141,17 +139,15 @@ Use the `template` and `outputPath` from Phase 0. Use `template` structure EXACT
 
 ### 2.1 Write Proposal
 
-**Before writing — 3 mandatory steps:**
+**Before writing — 2 mandatory steps:**
 
-**Step 1 — Capture:** Scan Phase 1 conversation. Extract every piece of information into a numbered capture list with FULL substance (not labels). Paste verbatim, do not paraphrase.
+**Step 1 — Map Phase 1 to template:** Phase 1 answers are in context — use them directly. Do NOT extract, summarize, or rephrase. For each template section (from Phase 0), map the full Phase 1 answer unchanged. Nothing left unmapped.
 
-**Step 2 — Map:** For each capture item, state which template section it maps to AND paste the content. Produce mapping before writing any artifact. Nothing left unmapped.
+**Step 2 — Density check:** Proposal must be at least as dense as Phase 1. Significantly shorter = information loss.
 
-**Step 3 — Density check:** Proposal must be at least as dense as Phase 1 discussions. Significantly shorter = information loss.
+Write from the mapping. Do NOT discard any Phase 1 answer.
 
-Write from mapping. Do NOT discard any capture item.
-
-**CRITICAL — Missing or underrepresented information propagates as blind spots into all downstream artifacts.** Every capture item must appear with full weight and specificity intact.
+**CRITICAL — Missing or underrepresented information propagates as blind spots into all downstream artifacts.** Every Phase 1 answer must appear with full weight and specificity intact.
 
 ### 2.2 Artifact Compliance Review (MANDATORY — single-shot)
 
