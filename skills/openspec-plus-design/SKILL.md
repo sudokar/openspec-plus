@@ -192,7 +192,7 @@ Phase 3 "sections" are DESIGN CONCERNS walked one at a time with user approval �
 
 ### Concrete Design Concerns (Phase 3 walk-through)
 
-Five + one conditional. Walk through each, get approval. Skip only if genuinely N/A.
+Five + one conditional + one mandatory. Walk through each, get approval. Skip only if genuinely N/A.
 
 1. **Architecture** — shape, layers, boundaries, external integration points
 2. **Component Structure** — units, responsibilities, interfaces
@@ -200,8 +200,7 @@ Five + one conditional. Walk through each, get approval. Skip only if genuinely 
 4. **Error Handling / Failure Modes** — what fails, propagation, retry, partial-failure, observability
 5. **Testing Approach** — design-level strategy: test pyramid (unit/integration/contract/e2e), environments, hard-to-test areas needing design accommodation, infrastructure, alignment with project standards from `AGENTS.md`/`CLAUDE.md`
 6. **Migration / Rollout** (when applicable) — rollout without breaking existing
-
-If the Phase 0 template has sections NOT covered by the 5+1 concerns above or the current design has concerns NOT covered by the 5+1 concerns above, add dynamic concerns during Phase 3 to collect substance for those sections. Walk them through with the user the same way.
+7. **Dynamic Concerns** (mandatory) — compare Phase 0 template sections against concerns 1-6; for each template section without substance AND each change-specific concern not addressed above, add a concern and walk it through with the user before proceeding to Phase 4.
 
 NEVER skip Error Handling or Testing for non-trivial changes. "Testing Approach" is DESIGN-level (what/where/infrastructure) — NOT test cases (→ spec Gherkin) or TDD ordering (→ implementor).
 
