@@ -143,7 +143,7 @@ Use the `template` and `outputPath` from Phase 0. Use `template` structure EXACT
 
 **Step 1 — Map Phase 1 to template:** Phase 1 answers are in context — use them directly. Do NOT extract, summarize, or rephrase. For each template section (from Phase 0), map the full Phase 1 answer unchanged. Nothing left unmapped.
 
-**Step 2 — Density check:** Proposal must be at least as dense as Phase 1. Significantly shorter = information loss.
+**Step 2 — Density check:** Proposal must be at least as dense as Phase 1.
 
 Write from the mapping. Do NOT discard any Phase 1 answer.
 

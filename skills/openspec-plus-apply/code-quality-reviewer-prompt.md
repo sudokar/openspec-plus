@@ -98,8 +98,7 @@ Dispatch subagent of type general (use your subagent/task tool):
       "should"-level rule violation. Note but don't block.
 
     Don't invent issues. Slice clean → say so. Cite the source doc
-    for every project-rule violation (e.g., "AGENTS.md §Naming:
-    `usrCtrl` should be `userController`").
+    for every project-rule violation.
 
     ## Return Format
 

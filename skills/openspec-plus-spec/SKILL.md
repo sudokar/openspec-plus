@@ -241,7 +241,7 @@ Use the `template` and `outputPath` from Phase 0. Use `template` structure EXACT
 
 **Step 1 — Map Phase 1 to template:** Phase 1 outputs are in context — use them directly. Do NOT extract, summarize, or rephrase. For each template section (from Phase 0), map the full Phase 1 content — requirements, Gherkin scenarios, and any structured output — unchanged. Nothing left unmapped.
 
-**Step 2 — Density check:** Spec must be at least as dense as Phase 1. Significantly shorter = information loss. **Structural fidelity:** every Gherkin scenario from Phase 1 must appear verbatim — prose replacement of any scenario fails this check.
+**Step 2 — Density check:** Spec must be at least as dense as Phase 1. **Structural fidelity:** every Gherkin scenario from Phase 1 must appear verbatim — prose replacement of any scenario fails this check.
 
 Write from the mapping. Do NOT discard any Phase 1 content.
 

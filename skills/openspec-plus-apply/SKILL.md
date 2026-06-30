@@ -172,7 +172,7 @@ Discovery order:
 2. `AGENTS.md` / `CLAUDE.md` / `GEMINI.md` documented commands
 3. Project README or build file conventions
 
-Missing or ambiguous → ask user ONCE via question tool. Do not ask repeatedly.
+Missing or ambiguous → ask user ONCE via question tool.
 
 ### 0.3 Mode Question (MANDATORY, blocking)
 

@@ -57,7 +57,7 @@ Every test — acceptance, unit, edge case, helper, error path — must be obser
 
 ### Mandatory Acceptance Coverage
 
-Every Gherkin scenario relevant to the slice in `spec.md` MUST become at least one test. The scenario IS the acceptance contract; the test IS the verification. A slice cannot ship with an uncovered scenario, even if all other tests pass.
+Every Gherkin scenario relevant to the slice in `spec.md` MUST become at least one test. A slice cannot ship with an uncovered scenario, even if all other tests pass.
 
 ### Encouraged Granular Coverage
 
@@ -106,7 +106,7 @@ The cycle forbids:
 
 * Starting test K+1 before K reaches COMPLETE
 * Skipping REFACTOR assessment — every test passes through it
-* Skipping state recording — audit trail is mandatory
+* Skipping state recording
 * Ending slice with uncovered Gherkin scenarios
 
 ---
@@ -148,7 +148,7 @@ Test 3 (unit — edge case for `mapAuthError(null)`):
 [repeat for each test...]
 ```
 
-If you find yourself thinking *"I know all 5 cases, let me write them all at once"* — STOP. That is the violation. Delete what you just wrote. Restart from test 1.
+If you find yourself thinking *"I know all 5 cases, let me write them all at once"* — STOP. Delete what you just wrote. Restart from test 1.
 
 > Writing all tests first: test 2 may pass immediately when test 1 is implemented, edge cases get glossed, refactor opportunities missed.
 
@@ -162,7 +162,7 @@ Before ANY code (mandatory, once per slice):
 2. Follow and apply references inside those files to other docs (coding standards, testing conventions, patterns)
 3. Slice's affected files — absorb local style
 
-These files are the contract — follow and apply every documented rule strictly, end-to-end (no cherry-picking). Re-read per slice (files may have been updated). Do NOT proceed to Phase 1 before reading is done.
+These files are the contract — follow and apply every documented rule strictly, end-to-end (no cherry-picking). Re-read per slice. Do NOT proceed to Phase 1 before reading is done.
 
 ---
 
@@ -251,14 +251,14 @@ If 200 lines and 50 would do — rewrite.
 3. Tests for slice's other scenarios still pass.
 4. Output pristine — no warnings, errors, deprecations.
 
-Test fails → fix production code, NOT the test. Test is the source of truth.
+Test fails → fix production code, NOT the test.
 Unrelated tests fail → fix now, before next test.
 
 ---
 
 ## Phase 5: REFACTOR — Mandatory Assessment, Conditional Action
 
-REFACTOR is NOT optional. After every GREEN, you MUST perform an explicit refactor assessment.
+After every GREEN, you MUST perform an explicit refactor assessment.
 
 Apply clean code principles and project conventions (Phase 0) on code introduced by this GREEN phase (slice files only). **Is refactoring needed?** (yes/no with one-sentence reason)
 
@@ -272,7 +272,7 @@ If **yes** → refactor respecting project conventions. Tests must stay green af
 
 Only after the current test's REFACTOR assessment is recorded, move to the next test. Return to Phase 1 RED with the next test (the next uncovered Gherkin scenario, OR the next implementer-initiated unit/edge/helper/error test).
 
-NEVER skip ahead. NEVER write the next test while the current one is still in GREEN or REFACTOR phase.
+NEVER write the next test while the current one is still in GREEN or REFACTOR phase.
 
 The slice is done when:
 * Every Gherkin scenario in spec.md has at least one passing test (mandatory acceptance coverage), AND

@@ -167,7 +167,7 @@ Dispatch subagent of type general (use your subagent/task tool):
 
     ## Step 6 — Self-Review
 
-    Before reporting DONE, verify ALL of these (fix gaps, don't report DONE with open items):
+    Before reporting DONE, verify ALL of these:
 
     * **Pre-RED:** project standards read + references followed + local patterns absorbed; paths recorded in report
     * **Completeness:** all tasks done, all Gherkin scenarios tested, all requirements implemented, design decisions honored, affected-files respected
@@ -213,7 +213,7 @@ Dispatch subagent of type general (use your subagent/task tool):
 
     * **Pre-RED reading summary** — paths read + one-line confirmation
       ("followed AGENTS.md and docs/testing.md rules end-to-end")
-    * Files changed (paths only — controller has the diff)
+    * Files changed (paths only)
     * Tests added (count + names, in the order scenarios were tackled)
     * **Per-test refactor outcomes** — for each test (acceptance + granular),
       the refactor assessment result (no-with-reasoning OR yes-with-action)

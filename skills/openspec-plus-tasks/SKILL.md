@@ -166,7 +166,7 @@ Use the `template` and `outputPath` from Phase 0. Use the structure exactly. Do 
 
 **Step 1 — Map Phase 1 slices to template:** Phase 1 slices and task descriptions are in context — use them directly. Do NOT extract, summarize, or rephrase. Map each slice and its tasks to the corresponding `## N.` group. Nothing left unmapped.
 
-**Step 2 — Density check:** Tasks must be at least as dense as Phase 1. Significantly shorter = information loss.
+**Step 2 — Density check:** Tasks must be at least as dense as Phase 1.
 
 Write from the mapping. Do NOT discard any Phase 1 slice or task.
 

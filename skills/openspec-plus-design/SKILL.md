@@ -274,7 +274,7 @@ Final design must: reflect selected approach, incorporate approved refinements, 
 
 **Step 1 — Map Phase 3 sections to template:** Your Phase 3 section outputs are already in context — use them directly. Do NOT extract, summarize, or rephrase. For each Phase 3 section, state which template section(s) it maps to and confirm the full content — including all tables, diagrams, and structured elements — will appear in the artifact unchanged. Nothing left unmapped.
 
-**Step 2 — Density check:** Artifact must be at least as dense as the sum of Phase 1-3 sections. Significantly shorter = information loss. **Structural fidelity sub-check:** every structured representation from Phase 1-3 must appear in the artifact in its original form — prose replacement of any structured content fails this check even if word count is similar.
+**Step 2 — Density check:** Artifact must be at least as dense as the sum of Phase 1-3 sections. **Structural fidelity sub-check:** every structured representation from Phase 1-3 must appear in the artifact in its original form — prose replacement of any structured content fails this check even if word count is similar.
 
 Write from the mapping. Do NOT discard any section content.
 
@@ -344,7 +344,7 @@ After receiving reviewer's response:
 * Status Approved → proceed to 4.3
 * Status Issues Found → fix each Issue inline in root context (NEVER re-dispatch)
 
-**Same density rule applies.** If the fixed design is significantly shorter than the sum of Phase 1-3 discussions, information was lost in the fix — re-expand before proceeding.
+**Same density rule applies.** If the fixed design is significantly shorter than the sum of Phase 1-3 discussions, re-expand before proceeding.
 
 ---
 

@@ -68,8 +68,7 @@ Dispatch subagent of type general (use your subagent/task tool):
     decisions + file structure. You do NOT review code quality —
     naming style, comments, decomposition, project rule compliance
     (AGENTS.md/CLAUDE.md/GEMINI.md), test framework conventions are
-    all the **code-quality reviewer's** job, not yours. Stay in
-    your lane.
+    all the **code-quality reviewer's** job, not yours.
 
     Categorize findings into five buckets. All five are 3-cycle-cap
     categories (implementer fixes, you re-review).
