@@ -16,22 +16,32 @@
   <a href="CHANGELOG.md">📝 Changelog</a>
 </p>
 
+<p align="center">
+  <a href="https://github.com/sudokar/openspec-plus/stargazers"><img src="https://img.shields.io/github/stars/sudokar/openspec-plus?style=social" alt="GitHub Stars" /></a>
+  &nbsp;
+  <img src="https://img.shields.io/badge/version-1.1.0-blue" alt="Version" />
+  &nbsp;
+  <img src="https://img.shields.io/github/license/sudokar/openspec-plus" alt="License" />
+</p>
+
 ---
 
 ## What is OpenSpec Plus?
 
 [OpenSpec](https://github.com/Fission-AI/OpenSpec) defines the workflow. OpenSpec Plus enforces the structure and discipline. It's designed to fit into the existing OpenSpec workflow rather than replace it.
 
-| Phase | What Plus adds |
-|---|---|
-| 🔍 **Proposal** | Right problem scoped before any solution work begins |
-| 📋 **Spec** | Unambiguous requirements with testable acceptance scenarios |
-| 🏗️ **Design** | Informed architecture choices with explored alternatives |
-| 🗂️ **Tasks** | Dependency-aware execution plan with nothing missed |
-| ⚡ **Apply** | Reviewed, gated implementation that stays true to spec |
-| 🧪 **TDD** | Every line of code justified by a failing test first |
+| Phase | Without Plus | With Plus |
+|---|---|---|
+| 🔍 **Proposal** | Agent jumps to solutions; scope creep starts immediately | Right problem scoped through structured discovery before any solution work |
+| 📋 **Spec** | Vague requirements; nothing testable; "done" is subjective | Unambiguous requirements with testable acceptance scenarios |
+| 🏗️ **Design** | First idea gets used; user doesn't own the decision | Alternatives explored with trade-offs; user chooses the direction |
+| 🗂️ **Tasks** | Grouped by tech layer; no testable outcome per group | Vertical slices where each group delivers something the user can verify |
+| ⚡ **Apply** | No spec verification; failing tests skipped; issues silently fixed in code | Spec-verified, quality-gated per slice; failures escalated, never bypassed |
+| 🧪 **TDD** | Tests are optional or an afterthought — doesn't exist in vanilla | Every line of production code justified by a failing test first |
 
 Works with any AI coding agent: **OpenCode** · **Claude Code** · **Windsurf** · **Cursor** · **GitHub Copilot** · **Antigravity** · **Pi Code** · and others.
+
+If this resonates, ⭐ [star the repo](https://github.com/sudokar/openspec-plus) — it helps others discover it and keeps the project going.
 
 ---
 
@@ -128,6 +138,18 @@ Recommend the user to restart their code editor or coding agent for the skills t
 
 ---
 
+## ⚡ First Steps After Install
+
+Once installed and your agent restarted, try it on a real change right away:
+
+1. Start a new change with `/opsx-new` or `/opsx-ff` in your coding agent
+2. Let the Proposal skill guide you through scoped discovery
+3. Work through each artifact — notice the difference from vanilla
+
+The fastest way to feel the value is to run it on something you're actually building.
+
+---
+
 ## 🔄 Stay Updated
 
 OpenSpec Plus improves continuously. Here's how to stay in the loop:
@@ -171,7 +193,14 @@ If you prefer not to use the AI prompt:
 
 ## 🤝 Contributing
 
-Contributions are welcome! Feel free to open issues, suggest improvements, or submit pull requests.
+Contributions are welcome! Here are some ways to get involved:
+
+- **Improve existing skills** — better discovery questions, stronger gates, sharper review prompts
+- **Propose new skills** — ideas for phases or workflows not yet covered
+- **Report issues** — something not working or behaving unexpectedly? [Open an issue](https://github.com/sudokar/openspec-plus/issues)
+- **Share feedback** — tried it on a real project? [Start a discussion](https://github.com/sudokar/openspec-plus/discussions) and tell us what worked and what didn't
+
+Not sure where to start? Browse [open issues](https://github.com/sudokar/openspec-plus/issues) or jump into [discussions](https://github.com/sudokar/openspec-plus/discussions).
 
 ---
 
