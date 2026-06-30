@@ -200,7 +200,10 @@ Five + one conditional + one mandatory. Walk through each, get approval. Skip on
 4. **Error Handling / Failure Modes** — what fails, propagation, retry, partial-failure, observability
 5. **Testing Approach** — design-level strategy: test pyramid (unit/integration/contract/e2e), environments, hard-to-test areas needing design accommodation, infrastructure, alignment with project standards from `AGENTS.md`/`CLAUDE.md`
 6. **Migration / Rollout** (when applicable) — rollout without breaking existing
-7. **Dynamic Concerns** (mandatory) — compare Phase 0 template sections against concerns 1-6; for each template section without substance AND each change-specific concern not addressed above, add a concern and walk it through with the user before proceeding to Phase 4.
+7. **Additional Concerns** (mandatory) — before Phase 4, run both checks:
+   - **Template gaps:** compare Phase 0 template sections against concerns 1-6; each section without substance becomes a concern.
+   - **Change-nature gaps:** given this specific change and design, are concerns like security, performance, observability, backwards compatibility, compliance, or resilience relevant but unaddressed by 1-6? Add those that apply.
+   Walk all additions through with the user the same way before proceeding to Phase 4.
 
 NEVER skip Error Handling or Testing for non-trivial changes. "Testing Approach" is DESIGN-level (what/where/infrastructure) — NOT test cases (→ spec Gherkin) or TDD ordering (→ implementor).
 
@@ -208,15 +211,15 @@ NEVER skip Error Handling or Testing for non-trivial changes. "Testing Approach"
 
 Map concerns into template sections at write time (default `spec-driven` schema — adapt if template differs):
 
-| Phase 3 concern | Lands in template section |
-|---|---|
-| Architecture | Decisions (architecture choice + rationale) and any dedicated Architecture section |
-| Component Structure | Decisions (component breakdown + interfaces) |
-| Data Flow | Decisions (flow + state ownership) |
+| Phase 3 concern                | Lands in template section |
+|--------------------------------|---|
+| Architecture                   | Decisions (architecture choice + rationale) and any dedicated Architecture section |
+| Component Structure            | Decisions (component breakdown + interfaces) |
+| Data Flow                      | Decisions (flow + state ownership) |
 | Error Handling / Failure Modes | Decisions (failure-handling strategy) and Risks (specific failure modes + mitigations) |
-| Testing Approach | Decisions (test boundary + infrastructure choices) |
-| Migration / Rollout | Migration Plan section |
-| Dynamic | Any section NOT covered by the 5+1 concerns above |
+| Testing Approach               | Decisions (test boundary + infrastructure choices) |
+| Migration / Rollout            | Migration Plan section |
+| Additional Concerns            | Any section NOT covered by the 5+1 concerns above |
 
 CONCERNS shape substance. TEMPLATE shapes structure.
 
