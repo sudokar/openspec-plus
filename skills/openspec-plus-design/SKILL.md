@@ -1,8 +1,9 @@
 ---
 name: openspec-plus-design
 description: "MANDATORY skill that activates whenever the OpenSpec design phase begins. Triggers: /opsx-new, /opsx-ff, or /opsx-continue runs; openspec-new-change, openspec-ff-change, openspec-continue-change, or openspec-explore is active; `openspec instructions design` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec design document."
-version: 1.0.0
+version: 1.1.0
 priority: high
+disable-user-invocation: true
 ---
 
 # OpenSpec Plus Design
@@ -26,8 +27,6 @@ Strengthen OpenSpec design with brainstorming patterns. Prevent premature archit
 - "Spec doesn't exist yet, I can sneak some requirements into the design"
 - "The design looks fine to me, I'll skip the reviewer subagent"
 - "Reviewer flagged minor issues, I'll re-dispatch after fixing to confirm"
-
-None justify skipping phases or pulling spec-level concerns into design.
 
 ---
 
@@ -87,33 +86,13 @@ Display workflow phases via task tool at start; update as each phase completes.
 
 ## Core Principles
 
-## Explore Before Converging
-
-Never commit to first approach. Always explore alternatives.
-
-## User Owns The Final Direction
-
-Model recommends. User decides.
-
-## Build Design Collaboratively
-
-NEVER generate full design at once. Build incrementally, review each section with user.
-
-## Design Before Documentation
-
-Validate design — including alignment with proposal and any existing spec — before writing design.md.
-
-## YAGNI — Complexity Must Be Justified
-
-Every abstraction, layer, indirection MUST serve a real present need.
-
-## Improve, Don't Refactor
-
-Targeted improvements to existing code only when they serve the change. Never propose unrelated refactoring.
-
-## Respect Project Standards
-
-Read project instruction files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, equivalents) at Phase 1 start. Design MUST respect project conventions. Conflicts → surface to user, never silently override.
+- **Explore Before Converging** — never commit to first approach; always explore alternatives.
+- **User Owns The Final Direction** — model recommends, user decides.
+- **Build Design Collaboratively** — NEVER generate full design at once; build incrementally, review each section with user.
+- **Design Before Documentation** — validate design (including alignment with proposal and any existing spec) before writing design.md.
+- **YAGNI — Complexity Must Be Justified** — every abstraction, layer, indirection MUST serve a real present need.
+- **Improve, Don't Refactor** — targeted improvements to existing code only when they serve the change; never propose unrelated refactoring.
+- **Respect Project Standards** — read project instruction files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, equivalents) at Phase 1 start; design MUST respect project conventions; conflicts → surface to user, never silently override.
 
 ## Use Stable Libraries Before Custom
 
@@ -126,22 +105,9 @@ Survey ecosystem before proposing custom code. For each significant component (p
 
 Respect any approved-library list from project instruction files. Don't propose libraries the project rejected.
 
-### Human-In-The-Loop Approval For Library Choices
+**Human-In-The-Loop Approval:** For ANY new library introduction or replacement, surface to user via question tool: 2-3 candidates evaluated, recommended choice + rationale, accepted tradeoffs, alternatives rejected + why. Do NOT commit a library in the design until user approves. Libraries already in use don't need re-approval.
 
-Library choices have long-term consequences (lock-in, security surface, maintenance, transitive deps). For ANY new library introduction or replacement, surface to user via question tool:
-
-* 2-3 candidates evaluated
-* Recommended choice + rationale
-* Accepted tradeoffs (size, license, transitive deps)
-* Alternatives rejected + why
-
-Do NOT commit a library in the design until user approves.
-
-Libraries already in use by the project don't need re-approval.
-
-## Stay At Architecture Level
-
-Design captures HOW (architecture, patterns, integration). NEVER capture WHAT (detailed requirements, scenarios, acceptance criteria) — that's spec phase, even when spec runs after design.
+- **Stay At Architecture Level** — design captures HOW (architecture, patterns, integration); NEVER capture WHAT (detailed requirements, scenarios, acceptance criteria) — that's spec phase.
 
 ---
 
@@ -180,40 +146,11 @@ Proposal answered "why" + capabilities. Spec (if present) answered "what". Proje
 
 If no spec exists and you find yourself defining detailed requirements, STOP — that's spec-phase work.
 
----
+Identify: architectural decisions that must be made and areas where multiple solutions exist. Missing important info? Use question tool — ONE question at a time, never batch, wait for response.
 
-## Design Understanding
+Generate TWO OR THREE viable design approaches (two when only two meaningful directions exist; three when three materially different solutions exist; never invent a weak approach). Each approach MUST satisfy proposal capabilities and spec (if present). For each provide: Approach Name, Core Idea, Advantages, Disadvantages, Complexity Level, Key Assumptions. Approaches must be meaningfully different — no cosmetic variations.
 
-Identify:
-
-* architectural decisions that must be made
-* areas where multiple solutions exist
-
----
-
-## Clarification Questions
-
-Missing important info? Use question tool. ONE question at a time. Never batch. Wait for response. Continue until major ambiguities resolved.
-
----
-
-## Generate Approaches
-
-Generate TWO OR THREE viable design approaches.
-
-Prefer two when only two meaningful directions exist. Three only when three materially different and realistic solutions exist. NEVER invent a weak approach to satisfy a count.
-
-Each approach MUST satisfy proposal capabilities. If spec exists, MUST also satisfy spec.
-
-For each approach provide: Approach Name, Core Idea, Advantages, Disadvantages, Complexity Level, Key Assumptions.
-
-Approaches must be meaningfully different. No cosmetic variations.
-
----
-
-## Recommendation
-
-Recommend ONE approach. Explain why preferred, what tradeoffs accepted, why alternatives less suitable.
+Recommend ONE approach: explain why preferred, what tradeoffs accepted, why alternatives less suitable.
 
 Mark Phase 1 complete. Update task status.
 
@@ -235,23 +172,17 @@ User may select any option. Two or three options.
 
 Mark Phase 2 complete. Update task status.
 
+## Library Resolution (before Phase 3)
+
+With the approach selected, identify every component that may require a new library (parsing, validation, HTTP, auth, crypto, queuing, scheduling, etc.). For each, apply Use Stable Libraries Before Custom: survey 2-3 candidates, evaluate, surface recommended choice + rationale via question tool, wait for approval. Do NOT begin Phase 3 until all new library choices are approved. Already-installed libraries do not need re-approval. No new libraries → proceed immediately.
+
 ---
 
 ## Phase 3: Build Design Sections
 
 After direction selected, build incrementally. NEVER generate full design at once. Generate ONE section at a time. Scale each section to its complexity — simple concerns need a few sentences, complex ones several paragraphs; length serves clarity, never appearance of rigor.
 
-After each section, ask via question tool:
-
-```text
-Does this section look correct?
-
-A. Continue (Recommended)
-B. Revise Section
-C. Revisit Design Direction
-```
-
-Wait for response before proceeding.
+After each section, ask via question tool: `Does this section look correct? A. Continue (Recommended) | B. Revise Section | C. Revisit Design Direction` — wait for response before proceeding.
 
 ---
 
@@ -261,7 +192,7 @@ Phase 3 "sections" are DESIGN CONCERNS walked one at a time with user approval �
 
 ### Concrete Design Concerns (Phase 3 walk-through)
 
-Five + one conditional. Walk through each, get approval. Skip only if genuinely N/A.
+Five + one conditional + one mandatory. Walk through each, get approval. Skip only if genuinely N/A.
 
 1. **Architecture** — shape, layers, boundaries, external integration points
 2. **Component Structure** — units, responsibilities, interfaces
@@ -269,6 +200,10 @@ Five + one conditional. Walk through each, get approval. Skip only if genuinely 
 4. **Error Handling / Failure Modes** — what fails, propagation, retry, partial-failure, observability
 5. **Testing Approach** — design-level strategy: test pyramid (unit/integration/contract/e2e), environments, hard-to-test areas needing design accommodation, infrastructure, alignment with project standards from `AGENTS.md`/`CLAUDE.md`
 6. **Migration / Rollout** (when applicable) — rollout without breaking existing
+7. **Additional Concerns** (mandatory) — before Phase 4, run both checks:
+   - **Template gaps:** compare Phase 0 template sections against concerns 1-6; each section without substance becomes a concern.
+   - **Change-nature gaps:** given this specific change and design, are concerns like security, performance, observability, backwards compatibility, compliance, or resilience relevant but unaddressed by 1-6? Add those that apply.
+   Walk all additions through with the user the same way before proceeding to Phase 4.
 
 NEVER skip Error Handling or Testing for non-trivial changes. "Testing Approach" is DESIGN-level (what/where/infrastructure) — NOT test cases (→ spec Gherkin) or TDD ordering (→ implementor).
 
@@ -276,16 +211,15 @@ NEVER skip Error Handling or Testing for non-trivial changes. "Testing Approach"
 
 Map concerns into template sections at write time (default `spec-driven` schema — adapt if template differs):
 
-| Phase 3 concern | Lands in template section |
-|---|---|
-| Architecture | Decisions (architecture choice + rationale) and any dedicated Architecture section |
-| Component Structure | Decisions (component breakdown + interfaces) |
-| Data Flow | Decisions (flow + state ownership) |
+| Phase 3 concern                | Lands in template section |
+|--------------------------------|---|
+| Architecture                   | Decisions (architecture choice + rationale) and any dedicated Architecture section |
+| Component Structure            | Decisions (component breakdown + interfaces) |
+| Data Flow                      | Decisions (flow + state ownership) |
 | Error Handling / Failure Modes | Decisions (failure-handling strategy) and Risks (specific failure modes + mitigations) |
-| Testing Approach | Decisions (test boundary + infrastructure choices) |
-| Migration / Rollout | Migration Plan section |
-
-If the Phase 0 template has sections NOT covered by the 5+1 concerns above, add dynamic concerns during Phase 3 to collect substance for those sections. Walk them through with the user the same way.
+| Testing Approach               | Decisions (test boundary + infrastructure choices) |
+| Migration / Rollout            | Migration Plan section |
+| Additional Concerns            | Any section NOT covered by the 5+1 concerns above |
 
 CONCERNS shape substance. TEMPLATE shapes structure.
 
@@ -336,17 +270,17 @@ Only after approaches explored, direction selected, and all sections reviewed/ac
 
 Final design must: reflect selected approach, incorporate approved refinements, preserve tradeoffs, align with proposal/spec, stay at architecture level. Use `template` and `outputPath` from Phase 0. Use template structure EXACTLY. Apply `instruction` and `rules` as constraints — do NOT copy them into the file.
 
+**Structure is content — preserve the form.** Whatever representation information took during Phase 1-3 — table, diagram, matrix, comparison, enumeration, flow, or any other non-prose structure — that form must carry through to the artifact unchanged. Reducing any structured representation to prose loses the structure and therefore the meaning, regardless of word count.
+
 **Before writing — 3 mandatory steps:**
 
-**Step 1 — Capture:** Scan Phase 1-3 conversation. Extract every piece of information into a numbered capture list with FULL substance (not labels). Paste verbatim, do not paraphrase. Capture ONLY selected approach — rejected approaches are not output.
+**Step 1 — Map Phase 3 sections to template:** Your Phase 3 section outputs are already in context — use them directly. Do NOT extract, summarize, or rephrase. For each Phase 3 section, state which template section(s) it maps to and confirm the full content — including all tables, diagrams, and structured elements — will appear in the artifact unchanged. Nothing left unmapped.
 
-**Step 2 — Map:** For each capture item, state which template section it maps to AND paste the content. Produce mapping before writing any artifact. Nothing left unmapped.
+**Step 2 — Density check:** Artifact must be at least as dense as the sum of Phase 1-3 sections. **Structural fidelity sub-check:** every structured representation from Phase 1-3 must appear in the artifact in its original form — prose replacement of any structured content fails this check even if word count is similar.
 
-**Step 3 — Density check:** Artifact must be at least as dense as the sum of Phase 1-3 discussions. Significantly shorter = information loss.
+Write from the mapping. Do NOT discard any section content.
 
-Write from mapping. Do NOT discard any capture item.
-
-**CRITICAL — Missing or underrepresented information propagates as blind spots into tasks and implementation.** Every capture item must appear with full weight and specificity intact.
+**CRITICAL — Missing or underrepresented information propagates as blind spots into tasks and implementation.** Every section must appear with full weight and specificity intact.
 
 Write to `outputPath` from Phase 0.
 
@@ -409,10 +343,16 @@ Recommendations (advisory, do not block):
 
 After receiving reviewer's response:
 
-* Status Approved → mark Phase 4 complete, surface design for user review
-* Status Issues Found → fix each Issue inline in root context, surface for user review (NEVER re-dispatch)
+* Status Approved → proceed to 4.3
+* Status Issues Found → fix each Issue inline in root context (NEVER re-dispatch)
 
-Mark Phase 4 complete. Present final workflow completion.
+**Same density rule applies.** If the fixed design is significantly shorter than the sum of Phase 1-3 discussions, re-expand before proceeding.
+
+---
+
+## 4.3 Mark Phase 4 Complete
+
+Surface design for user review. Mark Phase 4 complete. Present final workflow completion.
 
 ---
 

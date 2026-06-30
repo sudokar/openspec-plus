@@ -58,10 +58,7 @@ Dispatch subagent of type general (use your subagent/task tool):
 
     ## CRITICAL: Do Not Trust The Report
 
-    The implementer may be incomplete, optimistic, or wrong. Read actual
-    code at the paths above and verify independently — compare to
-    requirements line by line, check each scenario has a faithful test,
-    look for missing pieces and unreported additions.
+    Read actual code at the paths above and verify independently — compare to requirements line by line, check each scenario has a faithful test.
 
     ## Your Job
 
@@ -71,8 +68,7 @@ Dispatch subagent of type general (use your subagent/task tool):
     decisions + file structure. You do NOT review code quality —
     naming style, comments, decomposition, project rule compliance
     (AGENTS.md/CLAUDE.md/GEMINI.md), test framework conventions are
-    all the **code-quality reviewer's** job, not yours. Stay in
-    your lane.
+    all the **code-quality reviewer's** job, not yours.
 
     Categorize findings into five buckets. All five are 3-cycle-cap
     categories (implementer fixes, you re-review).
@@ -94,10 +90,6 @@ Dispatch subagent of type general (use your subagent/task tool):
 
     * Task `2.3 Add rate limiting middleware to /api/auth/login` —
       middleware file exists but is not wired into the route.
-    * Task `1.2 Persist sessions in Redis with 24h TTL` — Redis
-      adapter added, TTL not configured.
-    * Task `3.1 Update API docs for new login endpoint` — code
-      shipped without doc update.
 
     The slice is incomplete if ANY task in its group is unfulfilled.
     The reviewer reports one Task-Incomplete entry per unfulfilled
@@ -106,46 +98,35 @@ Dispatch subagent of type general (use your subagent/task tool):
     ### Missing-Requirement (3-cycle cap)
 
     Spec requirement (WHEN/THEN clause) with no corresponding
-    implementation. Examples:
+    implementation. Example:
 
     * Spec: "WHEN user submits empty email, THEN return 400". Code
       accepts empty email silently.
-    * Spec: "Session cookie SHALL expire after 24 hours". No expiry
-      logic exists.
 
     ### Missing-Scenario (3-cycle cap)
 
     Gherkin scenario in spec.md without a corresponding test, OR test
     exists but doesn't actually exercise the GIVEN/WHEN/THEN faithfully.
-    Examples:
+    Example:
 
     * Scenario "user logs in with invalid password" has no test.
-    * Test exists for "user logs in" but doesn't verify the redirect
-      step from THEN.
 
     ### Out-of-Scope (3-cycle cap)
 
     Implementation exceeding proposal scope or violating Non-Goals,
-    OR work outside the slice's task group (e.g., changes that don't
-    trace to any task in `{TASKS_TEXT}`). Examples:
+    OR work outside the slice's task group. Examples:
 
     * Proposal Non-Goal: "no admin features in v1". Code adds an admin
       endpoint.
-    * Slice asks for login. Code also adds password reset.
-    * Implementer added configurability or abstractions spec didn't
-      request.
     * Diff includes changes that don't trace to any task `N.K` in
       this slice's group.
 
     ### Design-Violation (3-cycle cap)
 
     Implementation contradicts a design decision or file structure.
-    Examples:
+    Example:
 
     * Design: "session storage in Redis". Code uses in-memory map.
-    * Design: "auth lives in `src/auth/*`". Code puts auth logic in
-      `src/util/`.
-    * Design names function `verifyToken`. Code uses `checkToken`.
 
     ### TDD-Discipline (advisory observation; not blocking)
 
@@ -179,10 +160,8 @@ Dispatch subagent of type general (use your subagent/task tool):
 
     * Each task `N.K`: locate fulfilling code/tests. Missing/partial → Task-Incomplete (cite `N.K`).
     * Each spec requirement: locate behavior. Missing → Missing-Requirement.
-    * Each Gherkin scenario: locate test, confirm GIVEN/WHEN/THEN map faithfully. Missing/paraphrased → Missing-Scenario.
-    * Each implementation file: confirm in expected affected-files set. Unexpected location → Design-Violation.
-    * Each Non-Goal: scan diff for violations → Out-of-Scope.
-    * Diff hunks not traceable to any task `N.K`: flag Out-of-Scope.
+    * Each Gherkin scenario: confirm GIVEN/WHEN/THEN map faithfully. Missing/paraphrased → Missing-Scenario.
+    * Each Non-Goal + diff hunks not traceable to any task `N.K` → Out-of-Scope.
     * Each `design.md` decision: confirm honored (storage, symbols, file structure). Violated → Design-Violation.
 
     Do NOT verify project-rule compliance — that is the code-quality reviewer's job.
@@ -236,12 +215,12 @@ Dispatch subagent of type general (use your subagent/task tool):
 | 1-2 | Implementer fixes issues, reviewer re-dispatched |
 | 3 | STOP. Pause and exit. Suggest `plus-spec` / `plus-design` artifact update for spec/design issues, OR `plus-tasks` if a task description is unclear/wrong. |
 
-NEVER attempt cycle 4. By cycle 3 the failure is structural.
+NEVER attempt cycle 4.
 
 ### Advisory: TDD-Discipline
 
-Controller may escalate (re-dispatch implementer with stronger TDD emphasis) but does not auto-pause. The reviewer cannot determine batching from end state alone, so this finding is observational.
+Controller may escalate (re-dispatch implementer with stronger TDD emphasis) but does not auto-pause.
 
 ### Out Of Scope For This Reviewer
 
-Project-rule compliance (AGENTS.md / CLAUDE.md / GEMINI.md and referenced docs), naming style, comments, decomposition, test framework idioms, lint/format/type-check — all of these are handled by the **code-quality reviewer** (Phase 2.A.4). This reviewer does not flag those issues.
+Project-rule compliance (AGENTS.md / CLAUDE.md / GEMINI.md and referenced docs), naming style, comments, decomposition, test framework idioms, lint/format/type-check — all handled by the **code-quality reviewer** (Phase 2.A.4).

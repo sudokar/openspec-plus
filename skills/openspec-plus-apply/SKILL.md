@@ -1,8 +1,9 @@
 ---
 name: openspec-plus-apply
 description: "MANDATORY skill that activates whenever the OpenSpec apply phase begins. Triggers: /opsx-apply runs, the openspec-apply-change vanilla skill is referenced or active, `openspec instructions apply` is invoked, or the user asks to implement, apply, execute, or build out an OpenSpec change ('implement the change', 'apply tasks', 'execute change', 'build out the change'). Takes over only vanilla step 6 (implementation loop) and emulates step 7 output (final status)."
-version: 1.0.1
+version: 1.1.0
 priority: high
+disable-user-invocation: true
 ---
 
 # OpenSpec Plus Apply
@@ -100,13 +101,8 @@ Display workflow phases via todowrite at start; update as phases complete. Add p
 
 ## Core Principles
 
-### Take Over Step 6 Only
-
-Vanilla owns steps 1-5 and 7. After Phase 3, emulate step 7 output and stop.
-
-### Trust The Artifacts
-
-Earlier OpenSpec phases validated the artifacts. NEVER re-critique. Implementation reveals an artifact gap → escalate (pause and exit, suggest plus-design / plus-spec). Never edit artifacts from inside this skill.
+- **Take Over Step 6 Only** — vanilla owns steps 1-5 and 7; after Phase 3, emulate step 7 output and stop.
+- **Trust The Artifacts** — earlier phases validated them; NEVER re-critique; implementation reveals a gap → escalate (pause/exit, suggest plus-design/plus-spec); never edit from inside this skill.
 
 ### Main Agent Context Hygiene (subagent mode ONLY)
 
@@ -119,13 +115,8 @@ In subagent mode, the controller NEVER reads slice's affected source files — p
 
 Artifacts (`proposal.md`, `spec.md`, `design.md`, `tasks.md`) are already in main context from vanilla — using them for subagent prompt excerpts is fine. Source code files are NOT.
 
-### Inline Mode Reading (inline mode ONLY)
-
-Main agent IS the implementer — reads files directly (no path-passing indirection). Reads project standards + affected files for Pre-RED, edits directly during TDD, self-reviews its own changes, reviews cumulative diff at Phase 3. Each file read once.
-
-### Pre-RED Reading (both modes)
-
-Before any code, implementer reads project standards (`AGENTS.md` / `CLAUDE.md` / `GEMINI.md` + referenced docs). Enforced by `openspec-plus-tdd` Phase 0. Follow every documented rule strictly, end-to-end (no cherry-picking). Subagent mode: implementer does this in isolated context; reviewers verify against same files. Inline mode: main agent reads directly.
+- **Inline Mode Reading** (inline mode only) — main agent IS the implementer; reads files directly; reads project standards + affected files for Pre-RED; edits directly during TDD; self-reviews own changes; reviews cumulative diff at Phase 3. Each file read once.
+- **Pre-RED Reading** (both modes) — before any code, implementer reads project standards (`AGENTS.md`/`CLAUDE.md`/`GEMINI.md` + referenced docs); enforced by `openspec-plus-tdd` Phase 0; follow every documented rule strictly, end-to-end (no cherry-picking).
 
 ### Strict TDD Through openspec-plus-tdd
 
@@ -140,29 +131,12 @@ Apply in every slice:
 3. **Surgical Changes** — every changed line traces to a task in this slice; never improve adjacent code.
 4. **Goal-Driven Execution** — each Gherkin scenario is a verifiable goal; loop independently until it passes.
 
-### Code Style Rule — Code As Documentation
-
-Canonical rules live in `openspec-plus-tdd` § Code Style Rules — Code As Documentation. Implementer (subagent or inline) loads `openspec-plus-tdd` and follows that section verbatim — code is self-documenting through good names, small focused functions, clear structure; comments are an exceptional last resort.
-
-### Never Ignore Failing Tests
-
-Failing tests, skipped tests (`.skip`, `.todo`, `xtest`, `it.skip`), commented-out tests, or `--bail` shortcuts that hide failures are anti-patterns. The pre-mark gate blocks progression on any failure. Fix the test or fix the code; never bypass.
-
-### Continuous Execution
-
-Do NOT pause between slices. Pause only on: BLOCKED (unrecoverable), 3+ failed fix cycles on any reviewer/gate, or 3+ NEEDS_CONTEXT in a row. Each pause exits, surfaces context, suggests plus-* update.
-
-### No Commits
-
-Vanilla doesn't commit. This skill doesn't either. User manages commits separately.
-
-### Resumability Is Free
-
-`openspec instructions apply` is the source of truth. Re-running `/opsx-apply` on a half-done change picks up at the next pending slice. No bespoke state files.
-
-### Respect Project Standards
-
-`AGENTS.md` / `CLAUDE.md` / `GEMINI.md` capture lint/format/test commands, code style, file organization, naming conventions. Implementer and inline mode honor these.
+- **Code Style** — canonical rules in `openspec-plus-tdd` § Code Style Rules; code is self-documenting; comments are exceptional last resort.
+- **Never Ignore Failing Tests** — `.skip`, `.todo`, `xtest`, `it.skip`, commented-out tests, or `--bail` shortcuts are anti-patterns; pre-mark gate blocks on any failure.
+- **Continuous Execution** — do NOT pause between slices; pause only on BLOCKED (unrecoverable), 3+ failed fix cycles, or 3+ NEEDS_CONTEXT in a row.
+- **No Commits** — vanilla doesn't commit; this skill doesn't either.
+- **Resumability Is Free** — `openspec instructions apply` is the source of truth; re-running picks up at next pending slice.
+- **Respect Project Standards** — `AGENTS.md`/`CLAUDE.md`/`GEMINI.md` capture lint/format/test commands, code style, file organization, naming conventions.
 
 ---
 
@@ -187,9 +161,9 @@ State handling:
 
 Identify ONCE at Phase 0 (used by per-slice + final gates):
 
-* **Lint** — e.g., `bun run lint`, `npm run lint`, `cargo clippy`, `ruff check`, `eslint`
-* **Format** — e.g., `bun run format`, `cargo fmt --check`, `prettier --check`
-* **Test** — e.g., `bun test`, `npm test`, `cargo test`, `pytest`
+* **Lint** — e.g., `bun run lint`
+* **Format** — e.g., `bun run format`
+* **Test** — e.g., `bun test`
 * **Other** — type-check (`tsc --noEmit`), schema-check, build-check, etc.
 
 Discovery order:
@@ -198,7 +172,7 @@ Discovery order:
 2. `AGENTS.md` / `CLAUDE.md` / `GEMINI.md` documented commands
 3. Project README or build file conventions
 
-Missing or ambiguous → ask user ONCE via question tool. Do not ask repeatedly.
+Missing or ambiguous → ask user ONCE via question tool.
 
 ### 0.3 Mode Question (MANDATORY, blocking)
 
@@ -220,7 +194,7 @@ How should the change be implemented?
    or when you have an explicit reason to avoid it.
 ```
 
-Both modes apply SAME discipline (TDD, principles, never-ignore-failures, per-slice gate, final gate). Subagent mode adds isolated reviewers; inline mode runs reviews as self-check checklists. Subagent mode is preferred because: (1) the implementer's context stays isolated per slice, (2) reviewer subagents have no bias from the implementer's reasoning, (3) the controller's context stays clean for orchestration. Inline mode loses these benefits.
+Both modes apply SAME discipline (TDD, principles, never-ignore-failures, per-slice gate, final gate). Subagent mode adds isolated reviewers; inline mode runs reviews as self-check checklists.
 
 If the user does not pick explicitly and provides no reason to prefer Inline, default to Subagent mode and proceed.
 
@@ -444,7 +418,7 @@ Proceed to hand-back.
 
 ## Hand-Back: Emulate Vanilla Step 7
 
-After Phase 3 completes (or skill pauses), produce step 7 output. Do NOT invoke vanilla.
+Produce step 7 output after Phase 3. Do NOT invoke vanilla.
 
 ### Success format
 
@@ -531,8 +505,6 @@ NEVER:
 * Make subagent read `tasks.md` (paste text) | modify spec/design from implementer | continue past 3+ failures | commit code
 * Dispatch parallel slices without dependency analysis + user confirmation | run full test suite for per-slice gate
 
-If TDD discipline breaks (batching, skipping tests, refactoring adjacent), STOP and enforce the discipline.
-
 ---
 
 ## Success Criteria
@@ -545,10 +517,7 @@ If TDD discipline breaks (batching, skipping tests, refactoring adjacent), STOP 
 
 ## What This Skill Does NOT Do
 
-Scope boundaries (in-flight rule violations are listed in Anti-Patterns above):
-
-* Modify vanilla `/opsx-apply` command (forbidden)
-* Modify vanilla `openspec-apply-change` skill (forbidden)
+* Modify vanilla `/opsx-apply` command or `openspec-apply-change` skill (forbidden)
 * Verify branch isolation (allowed on main/master)
 
 ---

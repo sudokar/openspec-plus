@@ -1,8 +1,9 @@
 ---
 name: openspec-plus-spec
 description: "MANDATORY skill that activates whenever the OpenSpec specification phase begins. Triggers: /opsx-new, /opsx-ff, or /opsx-continue runs; openspec-new-change, openspec-ff-change, openspec-continue-change, or openspec-explore is active; `openspec instructions spec` or `openspec instructions specs` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec specification."
-version: 1.0.1
+version: 1.1.0
 priority: high
+disable-user-invocation: true
 ---
 
 # OpenSpec Plus Spec
@@ -29,8 +30,6 @@ Strengthen specification quality. Requirements complete, testable, unambiguous, 
 - "The code I need to read is small, I'll just open it directly"
 - "I'll skim the spec myself, the reviewer subagent isn't needed"
 - "The fixes from the reviewer were minor, I should re-dispatch to confirm"
-
-None justify batching questions, skipping phases, deviating from Gherkin, reading code in root context, or re-running review subagent.
 
 ---
 
@@ -85,25 +84,11 @@ Display workflow phases via task tool at start; update as each phase completes.
 
 ## Core Principles
 
-## Describe What, Not How
-
-Spec defines behavior and outcomes, not implementation. Prefer "what must happen" over "how it will be built".
-
-## Every Requirement Must Be Verifiable
-
-Requirements MUST be testable. Avoid vague or subjective language.
-
-## Surface Missing Requirements
-
-Look for gaps in user behavior, system behavior, permissions, error handling, operational behavior, edge cases.
-
-## YAGNI — No Speculative Requirements
-
-Every requirement traces to proposal goal or present stakeholder need.
-
-## Respect Project Standards
-
-Read project instruction files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, equivalents) at Phase 1 start. Spec MUST respect project conventions. Conflicts → surface to user, never silently override.
+- **Describe What, Not How** — spec defines behavior and outcomes, not implementation; prefer "what must happen" over "how it will be built".
+- **Every Requirement Must Be Verifiable** — requirements MUST be testable; avoid vague or subjective language.
+- **Surface Missing Requirements** — look for gaps in user behavior, system behavior, permissions, error handling, operational behavior, edge cases.
+- **YAGNI — No Speculative Requirements** — every requirement traces to proposal goal or present stakeholder need.
+- **Respect Project Standards** — read project instruction files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, equivalents) at Phase 1 start; spec MUST respect project conventions; conflicts → surface to user, never silently override.
 
 ## Spec Phase Reads Code Only When Strictly Required — And Only Via Subagent
 
@@ -192,7 +177,7 @@ Rules:
 * Multiple scenarios per requirement encouraged when distinct branches exist (happy path, error, edge), never required
 * Non-functional requirements (response time, capacity) expressed as plain measurable criteria, not Gherkin
 
-Constructing scenarios surfaces ambiguity — behavioral requirement that can't be expressed as Given/When/Then is not testable; multiple valid phrasings means requirement is ambiguous.
+Constructing scenarios surfaces ambiguity — a requirement that can't be expressed as Given/When/Then is not testable.
 
 For each requirement lacking a scenario, with ambiguous scenario, or contradictory scenarios, use **question tool**. ONE question at a time.
 
@@ -250,17 +235,17 @@ Only begin writing after:
 
 Use the `template` and `outputPath` from Phase 0. Use `template` structure EXACTLY. Never improvise sections, restructure, or invent format conventions. Apply `instruction` and `rules` as constraints — do NOT copy them into the file.
 
-**Before writing — 3 mandatory steps:**
+**Structure is content — preserve the form.** Gherkin scenarios, requirement lists, and any structured output from Phase 1 must carry through to the spec unchanged. Reducing structured content to prose loses meaning regardless of word count.
 
-**Step 1 — Capture:** Scan Phase 1 conversation. Extract every piece of information into a numbered capture list with FULL substance (not labels). Paste verbatim, do not paraphrase.
+**Before writing — 2 mandatory steps:**
 
-**Step 2 — Map:** For each capture item, state which template section it maps to AND paste the content. Produce mapping before writing any artifact. Nothing left unmapped.
+**Step 1 — Map Phase 1 to template:** Phase 1 outputs are in context — use them directly. Do NOT extract, summarize, or rephrase. For each template section (from Phase 0), map the full Phase 1 content — requirements, Gherkin scenarios, and any structured output — unchanged. Nothing left unmapped.
 
-**Step 3 — Density check:** Spec must be at least as dense as Phase 1 discussions. Significantly shorter = information loss.
+**Step 2 — Density check:** Spec must be at least as dense as Phase 1. **Structural fidelity:** every Gherkin scenario from Phase 1 must appear verbatim — prose replacement of any scenario fails this check.
 
-Write from mapping. Do NOT discard any capture item.
+Write from the mapping. Do NOT discard any Phase 1 content.
 
-**CRITICAL — Missing or underrepresented information propagates as blind spots into design, tasks, and implementation.** Every capture item must appear with full weight and specificity intact.
+**CRITICAL — Missing or underrepresented information propagates as blind spots into design, tasks, and implementation.** Every Phase 1 output must appear with full weight and specificity intact.
 
 Write to `outputPath` from Phase 0.
 
@@ -270,7 +255,7 @@ Every scenario in written spec MUST use Gherkin syntax:
 
 * Uppercase keywords: GIVEN, WHEN, THEN, AND, BUT
 * One step per line
-* AND continues prior keyword's category (GIVEN AND, WHEN AND, THEN AND), used only when natural
+* AND continues prior keyword's category, used only when natural
 * BUT expresses exclusion or counter-outcome, used only when natural
 * Steps describe observable state and behavior, never implementation
 
