@@ -5,6 +5,16 @@ All notable changes to OpenSpec Plus will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-06-30
+
+### Fixed
+- `openspec-plus-tdd`: reverted skill body to 1.0.0 content — the 1.1.0 simplifications caused the RED→GREEN→REFACTOR cycle to not be followed strictly. Specifically, removed content included: the closing "None justify…" sentence for the red-flags section, the "The scenario IS the acceptance contract; the test IS the verification" line in Mandatory Acceptance Coverage, the entire "Why 'I'll write all the tests, then implement' is wrong" section (four concrete reasons), the explicit REFACTOR 5.1 Assessment / 5.2 Action split, the "NEVER skip ahead" cycle anchor, and the "This is the single most-violated rule" reinforcement on the WRONG/RIGHT examples. Body is now identical to commit `a50acda`.
+
+### Changed
+- `openspec-plus-tdd`: frontmatter `version` bumped to `1.0.1` (signals deliberate revert, preserves history); `disable-user-invocation: true` retained from 1.1.0 — correct and orthogonal to the content regression
+
+---
+
 ## [1.1.0] - 2026-06-30
 
 ### Added
