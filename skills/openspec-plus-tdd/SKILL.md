@@ -1,7 +1,7 @@
 ---
 name: openspec-plus-tdd
 description: "MANDATORY skill that activates whenever code is written to implement an OpenSpec change task. Triggers: openspec-plus-apply is active, /opsx-apply is running, the user is implementing tasks from an OpenSpec change, an implementer subagent dispatched by openspec-plus-apply is starting work, or the user invokes phrases like 'TDD for the change', 'implementing change tasks', or 'writing tests for spec scenarios'. Load before any production code is written for an OpenSpec change. Enforces strict RED-GREEN-REFACTOR per test (any test — acceptance, unit, edge case, helper). Iron Law: NO PRODUCTION CODE WITHOUT A FAILING TEST. Gherkin scenarios in spec.md are the canonical source for acceptance tests (every scenario MUST become at least one test); additional unit, edge-case, and helper tests are encouraged and follow the same per-test cycle."
-version: 1.1.0
+version: 1.0.1
 priority: high
 disable-user-invocation: true
 ---
@@ -45,6 +45,8 @@ Loaded by `openspec-plus-apply` (subagent prompt + inline mode) before any code 
 - "I know the project conventions, no need to re-read AGENTS.md"
 - "AGENTS.md has many rules — I'll apply the ones that feel relevant"
 
+None justify production code without a red test, ignored failures, speculative abstractions, comments on obvious code, or scope expansion.
+
 ---
 
 ## The Iron Law
@@ -57,7 +59,7 @@ Every test — acceptance, unit, edge case, helper, error path — must be obser
 
 ### Mandatory Acceptance Coverage
 
-Every Gherkin scenario relevant to the slice in `spec.md` MUST become at least one test. A slice cannot ship with an uncovered scenario, even if all other tests pass.
+Every Gherkin scenario relevant to the slice in `spec.md` MUST become at least one test. The scenario IS the acceptance contract; the test IS the verification. A slice cannot ship with an uncovered scenario, even if all other tests pass.
 
 ### Encouraged Granular Coverage
 
@@ -106,12 +108,14 @@ The cycle forbids:
 
 * Starting test K+1 before K reaches COMPLETE
 * Skipping REFACTOR assessment — every test passes through it
-* Skipping state recording
+* Skipping state recording — audit trail is mandatory
 * Ending slice with uncovered Gherkin scenarios
 
 ---
 
 ## Concrete Pattern: WRONG vs RIGHT
+
+This is the single most-violated rule. Read both examples carefully.
 
 ### WRONG — Batching (the model's training default)
 
@@ -124,7 +128,9 @@ Runs tests — all 5 pass.
 Reports DONE.
 ```
 
-End state identical to RIGHT — but discipline absent, batching real.
+This is NOT TDD. Each test passed immediately when production code arrived. You never observed test 1 failing in isolation. You never refactored after each green. You wrote the whole solution in your head and dumped it onto disk.
+
+The end state (5 tests, 5 features) is identical to RIGHT — but the discipline is absent. The reviewer cannot tell from end state alone, but YOU know you batched.
 
 ### RIGHT — One Test At A Time
 
@@ -148,9 +154,16 @@ Test 3 (unit — edge case for `mapAuthError(null)`):
 [repeat for each test...]
 ```
 
-If you find yourself thinking *"I know all 5 cases, let me write them all at once"* — STOP. Delete what you just wrote. Restart from test 1.
+Tests 1-2: Gherkin scenarios (mandatory acceptance). Test 3: implementer-initiated edge case (encouraged granular). All follow the same per-test cycle.
 
-> Writing all tests first: test 2 may pass immediately when test 1 is implemented, edge cases get glossed, refactor opportunities missed.
+If you find yourself thinking *"I know all 5 cases, let me write them all at once"* — STOP. That is the violation. Delete what you just wrote. Restart from test 1.
+
+### Why "I'll write all the tests, then implement" is wrong
+
+* Test 2 might pass immediately when you implement test 1 — you'd never know if test 2 actually tests what you think.
+* No checkpoint forces you to confront edge cases per test. Edge cases get glossed.
+* You miss refactor opportunities that emerge between tests.
+* The discipline is the value, not the end state.
 
 ---
 
@@ -159,10 +172,10 @@ If you find yourself thinking *"I know all 5 cases, let me write them all at onc
 Before ANY code (mandatory, once per slice):
 
 1. `AGENTS.md` / `CLAUDE.md` / `GEMINI.md` (or equivalents at project root, `.claude/`, `.opencode/`, `docs/`)
-2. Follow and apply references inside those files to other docs (coding standards, testing conventions, patterns)
+2. Follow references inside those files to other docs (coding standards, testing conventions, patterns)
 3. Slice's affected files — absorb local style
 
-These files are the contract — follow and apply every documented rule strictly, end-to-end (no cherry-picking). Re-read per slice. Do NOT proceed to Phase 1 before reading is done.
+These files are the contract — follow every documented rule strictly, end-to-end (no cherry-picking). Re-read per slice (files may have been updated). Do NOT proceed to Phase 1 before reading is done.
 
 ---
 
@@ -184,26 +197,29 @@ AND the user is redirected to `/dashboard`
 
 Translate directly into one minimal acceptance test:
 
-```python
-def test_logs_in_with_valid_credentials():
-    create_user(email="alice@example.com", password="correct-pw")
+```typescript
+test('logs in with valid credentials', async () => {
+  await createUser({ email: 'alice@example.com', password: 'correct-pw' });
 
-    response = submit_login(email="alice@example.com", password="correct-pw")
+  const response = await submitLogin({ email: 'alice@example.com', password: 'correct-pw' });
 
-    assert "session=" in response.headers["set-cookie"]
-    assert response.status_code == 302
-    assert response.headers["location"] == "/dashboard"
+  expect(response.headers['set-cookie']).toMatch(/session=/);
+  expect(response.status).toBe(302);
+  expect(response.headers.location).toBe('/dashboard');
+});
 ```
 
 **2. Granular test — implementer-initiated for a unit, edge case, helper, or error path (encouraged when valuable).**
 
 Example: while implementing the login above, the implementer factors out a `mapAuthError` helper. They add a unit test for it:
 
-```python
-def test_map_auth_error_handles_null_input():
-    with pytest.raises(ValueError, match="Invalid input"):
-        map_auth_error(None)
+```typescript
+test('mapAuthError handles null input', () => {
+  expect(() => mapAuthError(null)).toThrow('Invalid input');
+});
 ```
+
+This test was not derived from a Gherkin scenario — it was added because the helper's null case needs fast-feedback coverage. It follows the same cycle.
 
 Rules (both kinds):
 
@@ -251,20 +267,30 @@ If 200 lines and 50 would do — rewrite.
 3. Tests for slice's other scenarios still pass.
 4. Output pristine — no warnings, errors, deprecations.
 
-Test fails → fix production code, NOT the test.
+Test fails → fix production code, NOT the test. Test is the source of truth.
 Unrelated tests fail → fix now, before next test.
 
 ---
 
 ## Phase 5: REFACTOR — Mandatory Assessment, Conditional Action
 
-After every GREEN, you MUST perform an explicit refactor assessment.
+REFACTOR is NOT optional. After every GREEN, you MUST perform an explicit refactor assessment.
 
-Apply clean code principles and project conventions (Phase 0) on code introduced by this GREEN phase (slice files only). **Is refactoring needed?** (yes/no with one-sentence reason)
+### 5.1 Assessment (always)
 
-If **no** → record explicitly: *"Refactor assessment: not needed — minimal, clear, non-duplicative."* Proceed to NEXT.
+Apply clean code principles, project conventions (from Phase 0 reading), and look for common code smells in the code introduced by this test's GREEN phase (within the slice's files only).
 
-If **yes** → refactor respecting project conventions. Tests must stay green after every edit. NEVER add behavior, touch outside slice, or reformat adjacent code. If tests break → revert. Record outcome (e.g., *"Extracted `parseAuthHeader` helper; tests green"*).
+Answer in the report: **Is refactoring needed?** (yes/no with one-sentence reason)
+
+If **no** → state explicitly: *"Refactor assessment: no refactoring needed — code is minimal, clear, and non-duplicative."* Then move to NEXT.
+
+If **yes** → proceed to 5.2.
+
+### 5.2 Action (only if assessment = yes)
+
+Refactor respecting project conventions. Tests must stay green — run after every edit. NEVER add behavior, touch outside slice, or reformat adjacent code. If tests break → revert.
+
+Record outcome (e.g., *"Extracted `parseAuthHeader` helper; tests green"* or *"No refactoring needed — minimal, clear, non-duplicative"*).
 
 ---
 
@@ -272,7 +298,7 @@ If **yes** → refactor respecting project conventions. Tests must stay green af
 
 Only after the current test's REFACTOR assessment is recorded, move to the next test. Return to Phase 1 RED with the next test (the next uncovered Gherkin scenario, OR the next implementer-initiated unit/edge/helper/error test).
 
-NEVER write the next test while the current one is still in GREEN or REFACTOR phase.
+NEVER skip ahead. NEVER write the next test while the current one is still in GREEN or REFACTOR phase.
 
 The slice is done when:
 * Every Gherkin scenario in spec.md has at least one passing test (mandatory acceptance coverage), AND
@@ -296,10 +322,10 @@ The slice is done when:
 
 Code explains itself through good names, small focused functions, and clear structure.
 
-* **Self-documenting** — names describe intent, functions do one thing, structure makes flow obvious.
-* **Comments only for** genuinely non-obvious algorithms, external-constraint workarounds, counter-intuitive tradeoffs. Refactor before commenting.
-* **Never** describe obvious behavior in comments; never leave commented-out code, TODO, FIXME.
-* **Testable, readable, maintainable** — one mental load per function, one responsibility per file.
+* **Self-documenting.** Names describe intent. Functions do one thing. Structure makes flow obvious.
+* **Comments only when:** genuinely non-obvious algorithm, external-constraint workaround, or counter-intuitive tradeoff. Refactor before commenting — if better naming/structure removes the need, do that first.
+* **Never:** describe obvious behavior in comments; leave commented-out code, TODO, FIXME.
+* **Testable** (hard to test = hard to use), **readable** (one mental load per function), **maintainable** (one responsibility per file).
 
 ---
 
@@ -345,6 +371,6 @@ The slice's pre-mark gate (lint + format + tests + other on affected files) runs
 
 ## Success Criteria
 
-**Succeeds:** Pre-RED done; every Gherkin scenario passing; every test observed failing before passing; full per-test cycle before next; REFACTOR assessed+recorded; minimal production code; pristine output; no unnecessary comments; no adjacent refactoring; gate clean.
+**Succeeds:** Pre-RED done, every Gherkin scenario has a passing test, every test observed to fail before passing, full per-test cycle completed before starting next, REFACTOR assessed and recorded for each, minimal production code, pristine output, no unnecessary comments, no adjacent refactoring, gate clean.
 
-**Fails:** Pre-RED skipped; batching; next test before REFACTOR; assessment skipped; production code without failing test; tests skipped/commented; comments on obvious code; adjacent code touched; speculative abstractions; scenario paraphrased; uncovered scenarios.
+**Fails:** Pre-RED skipped, batching, next test before current REFACTOR complete, REFACTOR assessment skipped, production code without red-then-green test, tests skipped/commented, comments on obvious code, adjacent code touched, speculative abstractions, scenario paraphrased instead of translated, uncovered scenarios.

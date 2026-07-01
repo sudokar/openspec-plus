@@ -5,6 +5,16 @@ All notable changes to OpenSpec Plus will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-06-30
+
+### Fixed
+- `openspec-plus-tdd`: reverted skill body to 1.0.0 content — the 1.1.0 simplifications caused the RED→GREEN→REFACTOR cycle to not be followed strictly by some models.
+
+### Changed
+- `openspec-plus-tdd`: frontmatter `version` bumped to `1.0.1` (signals deliberate revert, preserves history); `disable-user-invocation: true` retained from 1.1.0 — correct and orthogonal to the content regression
+
+---
+
 ## [1.1.0] - 2026-06-30
 
 ### Added
