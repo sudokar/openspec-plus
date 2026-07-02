@@ -43,43 +43,51 @@ Dispatch subagent of type general (use your subagent/task tool):
 
     ## What To Check
 
-    ### Cross-Slice Integration
+    ### Cross-Slice Integration & Refactoring
 
-    * Shared interfaces consistent (signatures, types, error contracts match between producer/consumer)
-    * Naming uniform across slices (no drift)
-    * Cohesive file structure matches `design.md`
-    * No duplicate utilities across slices
+    Check across ALL slices combined:
+
+    * Shared interfaces consistent (signatures, types, error
+      contracts match between producer/consumer slices)
+    * Naming consistent across slices (same concept uses the
+      same name)
+    * Duplicate logic across slices MUST be consolidated
+    * Missed shared abstractions — repeated patterns that should
+      be a single shared component. Flag them.
+    * Superseded code — earlier slice code made redundant by
+      later slice but not removed. Flag it.
 
     ### Implementation Principles At Change Scope
 
-    Apply at WHOLE change, not individual slices:
+    Apply at WHOLE change scope — catch issues invisible to
+    per-slice reviews:
 
-    1. **Surgical** — every line traces to task/requirement; no cross-slice scope creep.
-    2. **Simplicity** — no emergent abstractions/config/error handling beyond what slices require.
-    3. **Goal-Driven** — every Gherkin scenario has a passing test.
-    4. **Think First** — cross-slice integration choices surfaced, not silently assumed.
+    1. **Surgical** — no cross-slice scope creep; every slice's
+       work traces to a task.
+    2. **Simplicity** — no emergent abstractions, config, or
+       error handling not required by individual slice tasks.
+    3. **Think First** — cross-slice integration choices are
+       explicit and intentional, not silently assumed.
 
-    ### Implementation-Reveals-Design-Issue
+    ### Implementation-Reveals-Artifact-Gap
 
-    Surface design gaps that became visible only through implementation (e.g., load-bearing cross-slice interfaces unspecified in design, failure modes handled ad hoc, emergent components needing explicit ownership). These warrant `plus-design` updates.
-
-    ### Test Coverage
-
-    Spot-check cumulative: every requirement tested, every scenario faithful, no skipped/commented tests.
+    Surface gaps visible only in implementation — missing scenarios,
+    unspecified interfaces, emergent components, task boundary
+    ambiguities. Flag which artifact needs updating (proposal,
+    spec, design, or tasks).
 
     ## Calibration
 
     Severity:
 
-    * **Critical** — broken integration, missing scenario coverage,
-      regression introduced by combination of slices. Must fix.
+    * **Critical** — broken integration, regression introduced by
+      combination of slices. Must fix.
     * **Important** — cross-slice naming drift, redundant abstractions,
       cumulative scope creep. Should fix.
     * **Minor** — observation for future work.
 
-    Implementation-reveals-design-issues are NOT severity-categorized
-    — surfaced separately as recommendations for artifact updates,
-    NOT as code-fix items.
+    Artifact gaps are NOT severity-categorized — advisory only,
+    NOT code-fix items.
 
     ## Return Format
 
@@ -100,9 +108,8 @@ Dispatch subagent of type general (use your subagent/task tool):
     - <issue> — file:line — <observation>
     - ...
 
-    **Implementation-Reveals-Design-Issue (advisory)**
-    - <observation> — <which slices touched it> — <suggested artifact
-      update: spec, design, or both>
+    **Artifact Gaps (advisory)**
+    - <observation> — <artifact to update: proposal, spec, design, or tasks>
     - ...
 
     **Assessment**

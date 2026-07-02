@@ -22,39 +22,30 @@ Dispatch subagent of type general (use your subagent/task tool):
 
     {TASKS_TEXT}
 
-    ## Spec Requirements
-
-    {SPEC_REQUIREMENTS}
-
-    ## Gherkin Scenarios (Must Be Test-Covered)
-
-    {SPEC_SCENARIOS}
-
-    ## Proposal Scope (Must NOT Be Exceeded)
-
-    Excerpts from proposal.md:
-
-    {PROPOSAL_SCOPE}
-
-    Including explicit Non-Goals — work the change is NOT supposed to add.
-
-    ## Design Decisions (Must Be Honored)
-
-    {DESIGN_DECISIONS}
-
-    Including file structure, component boundaries, naming choices.
-
     ## What Implementer Claims They Built
 
     {IMPLEMENTER_REPORT}
 
-    ## Files To Read (paths only — read them yourself)
+    ## Artifact Files (paths only — read them yourself)
+
+    * Proposal: {PROPOSAL_PATH}
+    * Spec(s) for this slice: {SPEC_PATHS}
+    * Design: {DESIGN_PATH}
+
+    * **Proposal and design** — read fully, end to end; their
+      structure is dynamic (template-driven). Every section that
+      touches this slice's scope, intent, constraints, non-goals,
+      or architectural decisions MUST be used for verification —
+      do NOT skip or deprioritize any detail.
+    * **Spec(s)** — only the spec file(s) relevant to this slice
+      are passed. Verify all requirements (WHEN/THEN clauses) and
+      Gherkin scenarios (GIVEN/WHEN/THEN) in them.
+
+    ## Changed Files (paths only — read them yourself)
 
     {CHANGED_FILE_PATHS}
 
-    These are the files the implementer modified or created. The
-    controller has NOT read them. Read each one in this isolated
-    subagent context.
+    These are the files the implementer modified or created.
 
     ## CRITICAL: Do Not Trust The Report
 
@@ -128,14 +119,17 @@ Dispatch subagent of type general (use your subagent/task tool):
 
     * Design: "session storage in Redis". Code uses in-memory map.
 
-    ### TDD-Discipline (advisory observation; not blocking)
+    ### TDD-Discipline (3-cycle cap)
 
-    The reviewer cannot determine from end state alone whether the
-    implementer followed RED→GREEN→REFACTOR per scenario or batched
-    them. If the implementer's per-scenario refactor outcomes (in
-    their report) are missing, vague ("no refactor needed" without
-    reasoning), or absent for some scenarios — note as advisory in
-    your findings. The controller decides whether to escalate.
+    The implementer MUST follow RED→GREEN→REFACTOR per test. Flag
+    as TDD-Discipline violation if:
+
+    * Per-test refactor outcomes are missing, vague, or incomplete
+    * Report evidence suggests tests were batched (multiple tests
+      written before production code)
+
+    TDD-Discipline violation → implementer redoes the slice with
+    strict per-test discipline.
 
     ### Out Of Scope For You
 
@@ -182,16 +176,13 @@ Dispatch subagent of type general (use your subagent/task tool):
       Detail: <what is missing or extra>
       Why it matters: <impact on slice contract>
 
-    Categories:
-      3-cycle cap:    Task-Incomplete | Missing-Requirement |
-                      Missing-Scenario | Out-of-Scope | Design-Violation
-      Advisory:       TDD-Discipline (controller decides escalation)
+    Categories (all 3-cycle cap):
+      Task-Incomplete | Missing-Requirement | Missing-Scenario |
+      Out-of-Scope | Design-Violation | TDD-Discipline
 
     Mark each issue clearly with its category. The controller's
-    handling depends on category:
-    * 3-cycle cap → implementer fixes → re-review (you will be
-      re-dispatched)
-    * Advisory → controller may escalate but does not auto-pause
+    handling: implementer fixes → re-review (you will be
+    re-dispatched). After 3 cycles → STOP.
 
     Do NOT include code-quality categories (naming, comments,
     decomposition, project-rule compliance, lint/format/test
@@ -208,18 +199,14 @@ Dispatch subagent of type general (use your subagent/task tool):
 
 ## Cap And Escalation (controller side)
 
-### 3-cycle cap categories: Task-Incomplete, Missing-Requirement, Missing-Scenario, Out-of-Scope, Design-Violation
+### 3-cycle cap handling
 
 | Cycle | Action |
 |---|---|
-| 1-2 | Implementer fixes issues, reviewer re-dispatched |
+| 1-2 | Implementer fixes issues, reviewer re-dispatched. TDD-Discipline violation → implementer redoes the slice with strict per-test discipline. |
 | 3 | STOP. Pause and exit. Suggest `plus-spec` / `plus-design` artifact update for spec/design issues, OR `plus-tasks` if a task description is unclear/wrong. |
 
 NEVER attempt cycle 4.
-
-### Advisory: TDD-Discipline
-
-Controller may escalate (re-dispatch implementer with stronger TDD emphasis) but does not auto-pause.
 
 ### Out Of Scope For This Reviewer
 
