@@ -1,7 +1,7 @@
 ---
 name: openspec-plus-apply
 description: "MANDATORY skill that activates whenever the OpenSpec apply phase begins. Triggers: /opsx-apply runs, the openspec-apply-change vanilla skill is referenced or active, `openspec instructions apply` is invoked, or the user asks to implement, apply, execute, or build out an OpenSpec change ('implement the change', 'apply tasks', 'execute change', 'build out the change'). Takes over only vanilla step 6 (implementation loop) and emulates step 7 output (final status)."
-version: 1.1.0
+version: 1.2.0
 priority: high
 disable-user-invocation: true
 ---
@@ -129,7 +129,7 @@ Apply in every slice:
 1. **Think Before Coding** — surface assumptions, ask when uncertain, never silently pick between interpretations.
 2. **Simplicity First** — minimum code that solves the problem; nothing speculative.
 3. **Surgical Changes** — every changed line traces to a task in this slice; never improve adjacent code.
-4. **Goal-Driven Execution** — each Gherkin scenario is a verifiable goal; loop independently until it passes.
+4. **Goal-Driven Execution** — each test—Gherkin or granular—is a verifiable goal; loop independently until it passes.
 
 - **Code Style** — canonical rules in `openspec-plus-tdd` § Code Style Rules; code is self-documenting; comments are exceptional last resort.
 - **Never Ignore Failing Tests** — `.skip`, `.todo`, `xtest`, `it.skip`, commented-out tests, or `--bail` shortcuts are anti-patterns; pre-mark gate blocks on any failure.
@@ -266,14 +266,14 @@ Dispatch implementer subagent using `./implementer-prompt.md`. Fill placeholders
 
 * `{SLICE_NUMBER}`, `{SLICE_NAME}`
 * `{TASKS_TEXT}` — full text of all `N.M` tasks
-* `{SPEC_REQUIREMENTS}`, `{SPEC_SCENARIOS}` (Gherkin) — extracted from `spec.md` already in context
-* `{DESIGN_DECISIONS}` — extracted from `design.md` already in context
-* `{AFFECTED_FILES}` — **paths only** (e.g., `src/auth/login.ts`, `tests/auth/login.test.ts`). Do NOT read these files in the main agent. The subagent reads them itself.
-* `{PROJECT_STANDARDS_PATHS}` — **paths only** to `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, and any docs they reference (e.g., `docs/coding-standards.md`, `docs/testing.md`, `CONTRIBUTING.md`, `docs/patterns/*`). Do NOT read them in the main agent. The subagent reads them as Step 0 (Pre-RED).
+* `{SPEC_PATHS}` — **paths only** to slice-relevant spec file(s) (requirements + Gherkin). Implementer reads them.
+* `{DESIGN_PATH}` — **path only** to `design.md` (from `contextFiles` in vanilla step 2-4 output). Implementer reads it end-to-end.
+* `{AFFECTED_FILES}` — **paths only** (e.g., `src/auth/login.ts`, `tests/auth/login.test.ts`). Implementer reads them.
+* `{PROJECT_STANDARDS_PATHS}` — **paths only** to `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, and any docs they reference (e.g., `docs/coding-standards.md`, `docs/testing.md`, `CONTRIBUTING.md`, `docs/patterns/*`). Implementer reads them in Step 0 (Pre-RED).
 * `{LINT_CMD}`, `{FORMAT_CMD}`, `{TEST_CMD}`, `{OTHER_CHECKS}` — discovered at Phase 0
 * `{WORKING_DIR}`
 
-NEVER make subagent read `tasks.md` — paste full slice text. NEVER inherit session history. NEVER pre-read affected source files into main context — that is the subagent's job.
+NEVER make subagent read `tasks.md` — paste full slice text. NEVER inherit session history. For spec/design/affected files, pass paths only; implementer reads them.
 
 #### 2.A.2 Handle Implementer Status
 
@@ -290,17 +290,37 @@ Never silently retry without changing something.
 
 #### 2.A.3 Spec-Compliance Review
 
-Dispatch using `./spec-compliance-reviewer-prompt.md`. Pass: slice tasks text, spec requirements + Gherkin scenarios, proposal/design excerpts (from context), paths to changed files, implementer's report. Main agent does NOT pre-read changed files.
+Dispatch using `./spec-compliance-reviewer-prompt.md`. Fill placeholders:
+
+* `{SLICE_NUMBER}`, `{SLICE_NAME}`
+* `{TASKS_TEXT}` — full text of all `N.M` tasks for this slice
+* `{IMPLEMENTER_REPORT}` — what the implementer reported after completing the slice
+* `{CHANGED_FILE_PATHS}` — **paths only** to files the implementer modified or created
+* `{PROPOSAL_PATH}` — **path only** to `proposal.md` (from `contextFiles` in vanilla step 2-4 output)
+* `{SPEC_PATHS}` — **paths only** to the spec file(s) relevant to this slice (only those containing requirements and Gherkin scenarios that map to this slice's tasks)
+* `{DESIGN_PATH}` — **path only** to `design.md` (from `contextFiles` in vanilla step 2-4 output)
+
+NEVER read artifact or changed files in main context — pass paths only; reviewer reads in isolated context.
 
 **OpenSpec-contract scope only** — does NOT verify project-rule compliance, naming style, comments, or lint/format. Those belong to code-quality reviewer (2.A.4).
 
-Returns ✅ Compliant OR ❌ Issues: `Task-Incomplete`, `Missing-Requirement`, `Missing-Scenario`, `Out-of-Scope`, `Design-Violation`. ❌ → implementer fixes → re-dispatch. Cap 3 cycles → STOP, pause and exit.
+Returns ✅ Compliant OR ❌ Issues: `Task-Incomplete`, `Missing-Requirement`, `Missing-Scenario`, `Out-of-Scope`, `Design-Violation`, `TDD-Discipline`. ❌ → implementer fixes → run per-slice gate (2.A.5) on affected files → re-dispatch reviewer. Cap 3 cycles → STOP, pause and exit.
 
 #### 2.A.4 Code-Quality Review
 
-ONLY after spec-compliance ✅. Dispatch using `./code-quality-reviewer-prompt.md`. Pass: slice description, tasks + requirements, changed file paths, project standards doc paths. Reviewer diffs via `git diff HEAD` (no git → reads files directly) and reads standards docs independently.
+ONLY after spec-compliance ✅. Dispatch using `./code-quality-reviewer-prompt.md`. Fill placeholders:
 
-Applies implementation principles + code-quality concerns + project-rule compliance. Returns Strengths / Issues (Critical/Important/Minor) / Assessment. ❌ → implementer fixes → re-review. Cap 3 cycles → STOP, pause and exit.
+* `{SLICE_NUMBER}`, `{SLICE_NAME}`
+* `{TASKS_TEXT}` — full text of all `N.M` tasks for this slice
+* `{IMPLEMENTER_REPORT}` — what the implementer reported after completing the slice
+* `{DESIGN_PATH}` — **path only** to `design.md` (from `contextFiles` in vanilla step 2-4 output); reviewer reads fully for architecture, file structure, naming, patterns
+* `{SPEC_PATHS}` — **paths only** to the spec file(s) relevant to this slice (same set passed to spec-compliance reviewer)
+* `{CHANGED_FILE_PATHS}` — **paths only** to files the implementer modified or created; reviewer diffs via `git diff HEAD` (no git → reads files directly)
+* `{STANDARDS_DOC_PATHS}` — **paths only** to `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, and referenced docs
+
+NEVER read artifact, changed, or standards files in main context — pass paths only; reviewer reads in isolated context.
+
+Applies implementation principles + code-quality concerns + project-rule compliance. Returns Strengths / Issues (Critical/Important/Minor) / Assessment. ❌ → implementer fixes → run per-slice gate (2.A.5) on affected files → re-dispatch reviewer. Cap 3 cycles → STOP, pause and exit.
 
 #### 2.A.5 Per-Slice Gate
 
@@ -340,7 +360,7 @@ Same gates and discipline as subagent mode, run by the main agent. The main agen
 
 #### 2.B.0 Pre-RED Reading (MANDATORY)
 
-Before any code, read: (1) project standards (`AGENTS.md` / `CLAUDE.md` / `GEMINI.md` + referenced docs), (2) slice's affected files for local patterns. Record one-line summary in TodoWrite. NEVER proceed before reading is done.
+Before any code, read: (1) project standards (`AGENTS.md` / `CLAUDE.md` / `GEMINI.md` + referenced docs), (2) slice's affected files for local patterns. After reading, MUST enumerate in TodoWrite every convention relevant to this slice's scope; MUST apply all of them — no selective skipping. NEVER proceed before reading is done.
 
 #### 2.B.1 Load TDD Skill
 
@@ -350,14 +370,19 @@ Use `skill` tool to load `openspec-plus-tdd` once at Phase 2 start. If already l
 
 Follow `openspec-plus-tdd` Per-Test State Machine: pick ONE test (acceptance from Gherkin = mandatory, or granular = encouraged), complete full cycle (RED → VERIFY-RED → GREEN → VERIFY-GREEN → REFACTOR assessment → NEXT) before starting next. NEVER batch. Record per-test refactor outcome. Done when every Gherkin scenario has a passing test AND all granular tests pass. Apply four implementation principles + code-as-documentation throughout.
 
+#### 2.B.2.1 Cross-Task Refactor (MANDATORY)
+
+AFTER all tests pass, BEFORE self-reviews. Scan ALL code across ALL tasks in this slice: duplicate logic → extract shared utility; naming drift → unify; shared abstractions emerged → consolidate; dead code from earlier tasks superseded → remove. Run tests after every refactor. Record outcome (or "nothing found — reason").
+
 #### 2.B.3 Inline Self-Reviews
 
-Run two checklists in order (mirroring subagent reviewers):
+Run three checklists in order (mirroring subagent reviewers). ALWAYS re-read `proposal.md`, slice-relevant `spec.md`/`specs/**/*.md`, and `design.md` before each self-check — do not rely on memory.
 
-* **Spec-compliance self-check** — every spec requirement implemented; every Gherkin scenario has a passing test; no work beyond proposal scope; design decisions honored; file structure matches design; naming consistent with proposal/spec/design terminology.
-* **Code-quality self-check** — surgical changes (every line traces to slice tasks); no speculative abstractions; **code is self-documenting (no comments describe obvious behavior; any comment that exists is for genuinely non-obvious logic / external-constraint workaround / counter-intuitive tradeoff, and a refactor was attempted first)**; no commented-out code or TODO/FIXME markers; single responsibility; naming clear; decomposition matches design; per-test refactor outcomes recorded.
+* **Spec-compliance self-check** — re-read proposal, slice-relevant spec file(s), and design end-to-end. Verify: every spec requirement implemented; every Gherkin scenario has a passing test; no work beyond proposal scope; design decisions honored; file structure matches design; naming consistent with artifact terminology.
+* **TDD-Discipline self-check** — verify each test completed the full per-test cycle individually (no batching); per-test refactor outcomes recorded with reasoning; all Gherkin scenarios covered. Violation → redo the slice with strict per-test discipline.
+* **Code-quality self-check** — re-read design for architecture, file structure, naming, and patterns. Verify against every convention enumerated in 2.B.0 — no selective skipping. Check: cross-task refactoring done (no duplicate logic, naming drift, missed shared abstractions, or dead code across tasks); surgical changes (every line traces to slice tasks); no speculative abstractions; **code is self-documenting (comments only for genuinely non-obvious logic / external-constraint workaround / counter-intuitive tradeoff; refactor attempted first)**; no commented-out code or TODO/FIXME markers; single responsibility; naming clear; decomposition matches design; per-test and cross-task refactor outcomes recorded.
 
-Issues found → fix inline → re-check. Cap 3 cycles per checklist → STOP, pause and exit.
+Issues found → fix inline → run per-slice gate (2.B.4) on affected files → re-check. Cap 3 cycles per checklist → STOP, pause and exit.
 
 #### 2.B.4 Per-Slice Gate
 

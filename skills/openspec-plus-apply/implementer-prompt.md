@@ -27,25 +27,38 @@ Dispatch subagent of type general (use your subagent/task tool):
     All tasks MUST be complete before reporting DONE. The last task makes
     the testable outcome verifiable end-to-end.
 
-    ## Spec Requirements
+    ## Artifact Files (paths only — read them yourself)
 
-    {SPEC_REQUIREMENTS}
+    * Spec(s): {SPEC_PATHS}
+    * Design: {DESIGN_PATH}
 
-    ## Gherkin Scenarios (Your RED Step Source)
+    * **Spec(s)** — read all requirements and Gherkin scenarios
+      before code.
+    * **Design** — read end-to-end. All slice-relevant
+      architecture, file structure, naming, and pattern decisions
+      MUST be honored.
 
-    {SPEC_SCENARIOS}
+    ## Gherkin Scenarios (Mandatory Acceptance Coverage)
 
-    Each scenario above is the canonical source for one failing test you
-    will write before any production code. Translate GIVEN/WHEN/THEN
-    faithfully — never paraphrase, never invent extra steps.
+    Read Gherkin from the spec file(s) above.
+
+    Each scenario is the canonical source for one acceptance test
+    written before production code. Translate GIVEN/WHEN/THEN
+    faithfully — NEVER paraphrase or invent extra steps.
+
+    ## Test Sources and TDD Scope (MANDATORY)
+
+    NO production code before a failing test.
+
+    Unit, edge-case, helper, and error-path tests are additional
+    RED sources. The same per-test cycle applies to EVERY test —
+    acceptance, unit, edge-case, helper, and error-path.
 
     ## Design Decisions
 
-    {DESIGN_DECISIONS}
-
-    Honor these. If a decision is missing or contradicts the spec, STOP
-    and report BLOCKED with reason "fundamental" — do NOT modify design
-    from this task.
+    Honor the design above. If a needed decision is missing or
+    contradicts the spec, STOP and report BLOCKED with reason
+    "fundamental" — do NOT modify design from this task.
 
     ## Affected Files
 
@@ -82,13 +95,25 @@ Dispatch subagent of type general (use your subagent/task tool):
 
     ## Step 0 — Pre-RED: Read Referenced Conventions (MANDATORY)
 
-    BEFORE any code, read project standards (non-negotiable, once per slice):
+    BEFORE any code, read once per slice:
 
-    1. {PROJECT_STANDARDS_PATHS} — AGENTS.md / CLAUDE.md / GEMINI.md or equivalents
-    2. Follow references inside those files to other docs (coding standards, testing conventions, patterns)
-    3. Slice's affected files (paths above) — absorb local style BEFORE writing
+    1. {SPEC_PATHS} — requirements + Gherkin scenarios
+    2. {DESIGN_PATH} — decisions, file structure, naming, patterns
+    3. {PROJECT_STANDARDS_PATHS} — AGENTS.md / CLAUDE.md / GEMINI.md or equivalents
+    4. Referenced docs from those files
+    5. Slice's affected files — local style
 
-    These files are the contract — follow every documented rule strictly, end-to-end (no cherry-picking). In your report, state which files you read + confirmation. Do NOT proceed to Step 1 before reading is done.
+    These files are the contract. MUST enumerate all relevant
+    conventions in your report. MUST apply all of them — no
+    selective skipping.
+
+    Report:
+
+    * Files read
+    * Relevant conventions
+    * Confirmation all were applied
+
+    Do NOT proceed to Step 1 before reading is done.
 
     ## Step 1 — Load TDD Discipline (MANDATORY)
 
@@ -107,7 +132,7 @@ Dispatch subagent of type general (use your subagent/task tool):
     1. **Think Before Coding** — surface assumptions, ASK if ambiguous; never silently pick between interpretations.
     2. **Simplicity First** — minimum code per test; no speculative abstractions, no flexibility the scenario didn't ask for.
     3. **Surgical Changes** — every changed line traces to a slice task; no adjacent improvements or unrelated reformatting.
-    4. **Goal-Driven Execution** — each Gherkin scenario is the verifiable goal; loop RED→GREEN→REFACTOR until clean.
+    4. **Goal-Driven Execution** — the current test—Gherkin or granular—is the verifiable goal; loop RED→GREEN→REFACTOR until clean.
 
     ## Step 3 — Code Style: Code As Documentation
 
@@ -145,37 +170,55 @@ Dispatch subagent of type general (use your subagent/task tool):
 
     NEVER batch-write tests. NEVER write production for future tests.
     NEVER skip VERIFY-RED or REFACTOR assessment. NEVER ship with
-    uncovered Gherkin scenarios.
+    uncovered Gherkin scenarios. If you catch yourself batching —
+    even test 1 correct, then tests 2..N batched — STOP, delete,
+    restart from next single test.
 
-    ### Critical Anti-Pattern
+    ## Step 5 — Cross-Task Refactor (MANDATORY)
 
-    Your instinct is to batch. Test 1 correct then tests 2..N batched is STILL a violation.
-    If you catch yourself batching → STOP, delete, restart from next single test.
+    AFTER all tests pass, BEFORE gate, scan code across ALL tasks
+    in this slice for:
 
-    ## Step 5 — Pre-Mark Gate
+    * Duplicate logic → extract shared utility
+    * Inconsistent naming → unify
+    * Shared abstractions → consolidate
+    * Dead code superseded by later work → remove
 
-    After all scenarios pass, run gate commands on affected files:
+    Run tests after each refactor. All green → proceed. Any red →
+    revert, rethink, retry. Record what you refactored, or
+    "nothing found — reason", in your report.
+
+    ## Step 6 — Pre-Mark Gate
+
+    After cross-task refactor, run a scoped auto-fix pass on
+    affected files if safe project/tooling commands exist:
+
+    * ONLY use safe auto-fix commands scoped to affected files
+    * Auto-fix may cover format, lint, or other static-analysis issues
+    * Auto-fix is NOT the gate — after it, run the clean verification gate below
+
+    Then run gate commands on affected files:
 
     * Lint clean (zero errors, zero warnings)
     * Format clean
     * Tests affected by slice all pass with pristine output
     * Other checks clean
 
-    ANY failure → return to failing scenario's TDD cycle, fix
-    production code (NOT the test), re-run gate. NEVER skip or hide
-    failures.
+    ANY failure → return to failing test's TDD cycle, fix
+    production code (NOT the test), re-run auto-fix if still
+    applicable, then re-run gate. NEVER skip or hide failures.
 
-    ## Step 6 — Self-Review
+    ## Step 7 — Self-Review
 
     Before reporting DONE, verify ALL of these:
 
     * **Pre-RED:** project standards read + references followed + local patterns absorbed; paths recorded in report
     * **Completeness:** all tasks done, all Gherkin scenarios tested, all requirements implemented, design decisions honored, affected-files respected
     * **TDD:** each test went through full per-test cycle individually (no batching); all scenarios covered; output pristine; no skipped/todo tests
-    * **REFACTOR:** assessment recorded per test (yes-with-action or no-with-reasoning); tests green through any refactor; no adjacent code touched
+    * **Refactor:** per-test outcomes recorded (yes-with-action or no-with-reasoning); tests stayed green; no adjacent code touched; cross-task duplication, naming drift, shared abstractions, and dead code addressed; outcome recorded
     * **Principles:** surgical (every line traces to task), simple (no speculative code), existing style matched
     * **Code style:** self-documenting; no unnecessary comments; no TODO/FIXME/commented-out code; each file one responsibility
-    * **Gate:** lint, format, tests, other checks all clean on affected files
+    * **Gate:** confirm Step 6 ran clean — lint, format, tests, and other checks all passed on affected files
 
     ## DO NOT
 

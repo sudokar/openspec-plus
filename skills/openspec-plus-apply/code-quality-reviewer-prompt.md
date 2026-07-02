@@ -18,24 +18,35 @@ Dispatch subagent of type general (use your subagent/task tool):
     ("{SLICE_NAME}") of an OpenSpec change. Spec compliance has already
     been confirmed; do not re-review correctness against the spec.
 
-    ## Description
+    ## Slice Tasks
 
-    {SLICE_SUMMARY_FROM_IMPLEMENTER}
+    {TASKS_TEXT}
 
-    ## Plan / Requirements
+    ## What Implementer Claims They Built
 
-    Slice tasks: {TASKS_TEXT}
+    {IMPLEMENTER_REPORT}
 
-    Relevant spec requirements: {SPEC_REQUIREMENTS}
+    ## Artifact Files (paths only — read them yourself)
+
+    * Design: {DESIGN_PATH}
+    * Spec(s) for this slice: {SPEC_PATHS}
+
+    * **Design** — read fully, end to end; its structure is dynamic
+      (template-driven). Every section that touches this slice's
+      architecture, file structure, component boundaries, naming,
+      or patterns MUST be used for verification — do NOT skip or
+      deprioritize any detail.
+    * **Spec(s)** — only the spec file(s) relevant to this slice
+      are passed. Use requirements and Gherkin scenarios as the
+      scope boundary for surgical/simplicity checks.
 
     ## Diff
 
     Changed files: {CHANGED_FILE_PATHS}
 
-    Run `git diff HEAD -- {CHANGED_FILE_PATHS}` yourself. Controller
-    has NOT pre-read the diff. Read carefully; every claim must
-    reference actual code. If git is unavailable, read each file
-    directly and note the fallback in your report.
+    Run `git diff HEAD -- {CHANGED_FILE_PATHS}` yourself. Every
+    claim MUST reference actual code. If git is unavailable, read
+    each file directly and note the fallback in your report.
 
     ## Project Standards Documents (Read Independently)
 
@@ -43,9 +54,10 @@ Dispatch subagent of type general (use your subagent/task tool):
 
     {STANDARDS_DOC_PATHS}
 
-    Open and read each one, including referenced docs (e.g., `AGENTS.md` links to `docs/coding-standards.md` — read that too).
-
-    The implementer was required to follow every documented rule strictly. Verify the implementation honors every applicable rule.
+    Read each one, including referenced docs. MUST enumerate all
+    conventions relevant to this slice's scope, MUST verify all of
+    them with no selective skipping, and in your report MUST list
+    the conventions verified and cite source docs for violations.
 
     ## What To Check
 
@@ -63,6 +75,17 @@ Dispatch subagent of type general (use your subagent/task tool):
     * **Error handling** — matches codebase's existing patterns
     * **Test quality** — tests exercise real behavior not mock
       behavior; comprehensive for slice's scenarios
+
+    Cross-task refactoring concerns:
+
+    * **Duplicate logic** — same or near-same code across tasks
+      MUST be extracted into shared utility.
+    * **Naming drift** — same concept named differently across
+      tasks MUST be unified.
+    * **Missed shared abstractions** — repeated patterns across
+      tasks. Flag them.
+    * **Dead code** — earlier-task code superseded but not
+      removed. Flag it.
 
     Implementation principles concerns:
 
