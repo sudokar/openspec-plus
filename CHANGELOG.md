@@ -5,6 +5,18 @@ All notable changes to OpenSpec Plus will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-07-02
+
+### Added
+- `openspec-plus-apply`: explicit TDD-discipline checks and cross-task/cross-slice refactor checks.
+
+### Changed
+- `openspec-plus-apply`: implementer and reviewers now read spec/design artifacts directly from passed paths.
+- `openspec-plus-apply`: review flow reruns per-slice gates after fixes before re-review.
+- `openspec-plus-apply`: inline and final review are more focused on relevant conventions, artifact fidelity, and cross-slice integration.
+
+---
+
 ## [1.1.1] - 2026-06-30
 
 ### Fixed
