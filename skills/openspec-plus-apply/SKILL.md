@@ -1,7 +1,7 @@
 ---
 name: openspec-plus-apply
 description: "MANDATORY skill that activates whenever the OpenSpec apply phase begins. Triggers: /opsx-apply runs, the openspec-apply-change vanilla skill is referenced or active, `openspec instructions apply` is invoked, or the user asks to implement, apply, execute, or build out an OpenSpec change ('implement the change', 'apply tasks', 'execute change', 'build out the change'). Takes over only vanilla step 6 (implementation loop) and emulates step 7 output (final status)."
-version: 1.2.0
+version: 1.2.1
 priority: high
 disable-user-invocation: true
 ---
@@ -364,7 +364,7 @@ Before any code, read: (1) project standards (`AGENTS.md` / `CLAUDE.md` / `GEMIN
 
 #### 2.B.1 Load TDD Skill
 
-Use `skill` tool to load `openspec-plus-tdd` once at Phase 2 start. If already loaded in session, reference instead of reload.
+Use `skill` tool to load `openspec-plus-tdd` once at Phase 2 start. If already loaded in session, reference instead of reload. If no skill tool is available, read its SKILL.md directly from your skills directory.
 
 #### 2.B.2 Per-Slice TDD Cycle (ONE TEST AT A TIME)
 

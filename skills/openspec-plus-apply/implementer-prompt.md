@@ -12,6 +12,8 @@ Dispatch an implementer subagent for one OpenSpec change slice.
 
 ---
 
+> type-general dispatch: Claude Code `Agent(general-purpose)` · Devin/Windsurf `run_subagent(subagent_general)` · OpenCode `@general` · Codex `spawn_agent` (`multi_agent=true`) · Antigravity `invoke_subagent(self)` · Pi `subagent` · unlisted → self-assess; no dispatch tool → controller chooses inline.
+
 ```
 Dispatch subagent of type general (use your subagent/task tool):
   description: "Implement slice {SLICE_NUMBER}: {SLICE_NAME}"
@@ -117,7 +119,8 @@ Dispatch subagent of type general (use your subagent/task tool):
 
     ## Step 1 — Load TDD Discipline (MANDATORY)
 
-    Use the `skill` tool to load `openspec-plus-tdd` BEFORE any code.
+    Use the `skill` tool to load `openspec-plus-tdd` BEFORE any code. If no
+    skill tool is available, read its SKILL.md directly from your skills directory.
     Iron Law: NO PRODUCTION CODE WITHOUT A FAILING TEST. Follow the
     Per-Test State Machine (digraph in that skill) for EACH test,
     atomically. Every Gherkin scenario MUST become at least one test

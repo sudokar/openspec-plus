@@ -362,8 +362,8 @@ NEVER: skip Pre-RED reading | batch tests | move to next test before current REF
 
 ## Integration With openspec-plus-apply
 
-* **Subagent mode:** implementer subagent uses `skill` tool to load this skill before any code. Each subagent loads fresh in isolated context.
-* **Inline mode:** main agent uses `skill` tool once at Phase 2 start. If already loaded in main agent context, reference instead of reload.
+* **Subagent mode:** implementer subagent uses `skill` tool to load this skill before any code; if unavailable, reads this SKILL.md directly from the skills directory. Each subagent loads fresh in isolated context.
+* **Inline mode:** main agent uses `skill` tool once at Phase 2 start; if unavailable, reads this SKILL.md directly from the skills directory. If already loaded in main agent context, reference instead of reload.
 
 The slice's pre-mark gate (lint + format + tests + other on affected files) runs AFTER the TDD cycle completes for all tests AND every Gherkin scenario is covered. Gate failure → return to failing test's TDD cycle. Never bypass.
 

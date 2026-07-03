@@ -1,7 +1,7 @@
 ---
 name: openspec-plus-spec
 description: "MANDATORY skill that activates whenever the OpenSpec specification phase begins. Triggers: /opsx-new, /opsx-ff, or /opsx-continue runs; openspec-new-change, openspec-ff-change, openspec-continue-change, or openspec-explore is active; `openspec instructions spec` or `openspec instructions specs` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec specification."
-version: 1.1.0
+version: 1.1.1
 priority: high
 disable-user-invocation: true
 ---
@@ -273,6 +273,7 @@ BUT no audit logs are exposed
 ## 3.3 Artifact Compliance Review (mandatory, single-shot)
 
 Dispatch subagent of type `general` (use your subagent/task tool) with reviewer prompt below. Subagent loads spec, proposal, design (if present) into its own context, returns structured findings list, exits.
+> type-general dispatch: Claude Code `Agent(general-purpose)` · Devin/Windsurf `run_subagent(subagent_general)` · OpenCode `@general` · Codex `spawn_agent` (`multi_agent=true`) · Antigravity `invoke_subagent(self)` · Pi `subagent` · unlisted → self-assess; no dispatch tool → execute inline as self-check.
 
 **Discipline:**
 
