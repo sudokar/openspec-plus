@@ -12,10 +12,10 @@ Dispatch an implementer subagent for one OpenSpec change slice.
 
 ---
 
-> type-general dispatch: Claude Code `Agent(general-purpose)` · Devin/Windsurf `run_subagent(subagent_general)` · OpenCode `@general` · Codex `spawn_agent` (`multi_agent=true`) · Antigravity `invoke_subagent(self)` · Pi `subagent` · unlisted → self-assess; no dispatch tool → controller chooses inline.
+> type-general-purpose dispatch: Claude Code `Agent(general-purpose)` · Devin/Windsurf `run_subagent(subagent_general)` · OpenCode `@general` · Codex `spawn_agent` (`multi_agent=true`) · Antigravity `invoke_subagent(self)` · Pi `subagent` · unlisted → self-assess; no dispatch tool → controller chooses inline.
 
 ```
-Dispatch subagent of type general (use your subagent/task tool):
+Dispatch subagent of type general-purpose (use your subagent/task tool):
   description: "Implement slice {SLICE_NUMBER}: {SLICE_NAME}"
   prompt: |
     You are implementing slice {SLICE_NUMBER} ("{SLICE_NAME}") of an OpenSpec change.

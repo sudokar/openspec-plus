@@ -8,10 +8,10 @@ Dispatch the whole-change reviewer subagent at Phase 3 (after all slices `[x]`, 
 
 ---
 
-> type-general dispatch: Claude Code `Agent(general-purpose)` · Devin/Windsurf `run_subagent(subagent_general)` · OpenCode `@general` · Codex `spawn_agent` (`multi_agent=true`) · Antigravity `invoke_subagent(self)` · Pi `subagent` · unlisted → self-assess; no dispatch tool → controller chooses inline.
+> type-general-purpose dispatch: Claude Code `Agent(general-purpose)` · Devin/Windsurf `run_subagent(subagent_general)` · OpenCode `@general` · Codex `spawn_agent` (`multi_agent=true`) · Antigravity `invoke_subagent(self)` · Pi `subagent` · unlisted → self-assess; no dispatch tool → controller chooses inline.
 
 ```
-Dispatch subagent of type general (use your subagent/task tool):
+Dispatch subagent of type general-purpose (use your subagent/task tool):
   description: "Final whole-change review for {CHANGE_NAME}"
   prompt: |
     You are reviewing the complete implementation of an OpenSpec change
