@@ -6,12 +6,14 @@ Dispatch a code-quality reviewer subagent for an OpenSpec change slice.
 
 **Order:** Dispatch ONLY after spec-compliance reviewer returns ✅. Never run code-quality before spec-compliance is clean.
 
-**Reviewer reads the diff itself.** Controller passes changed file paths; reviewer runs `git diff HEAD` in its isolated context, falling back to reading files directly if git unavailable.
+**Reviewer reads the diff itself.** Main agent passes changed file paths; reviewer runs `git diff HEAD` in its isolated context, falling back to reading files directly if git unavailable.
 
 ---
 
+> type-general-purpose dispatch: Claude Code `Agent(general-purpose)` · Devin/Windsurf `run_subagent(subagent_general)` · OpenCode `@general` · Codex `spawn_agent` (`multi_agent=true`) · Antigravity `invoke_subagent(self)` · Pi `subagent` · unlisted → self-assess; no dispatch tool → main agent chooses inline.
+
 ```
-Dispatch subagent of type general (use your subagent/task tool):
+Dispatch subagent of type general-purpose (use your subagent/task tool):
   description: "Review code quality for slice {SLICE_NUMBER}"
   prompt: |
     You are reviewing code quality of slice {SLICE_NUMBER}
@@ -149,7 +151,7 @@ Dispatch subagent of type general (use your subagent/task tool):
 
 ---
 
-## Cap And Escalation (controller side)
+## Cap And Escalation (main agent side)
 
 | Cycle | Action |
 |---|---|

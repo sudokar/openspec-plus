@@ -4,14 +4,16 @@ Dispatch a spec-compliance reviewer subagent for an OpenSpec change slice.
 
 **Purpose:** Verify implementer built exactly what proposal + spec + design specified for this slice — no missing requirements, no missing scenarios, no out-of-scope additions, no design violations.
 
-**CRITICAL:** Don't trust the implementer's report. **You** read the actual code at the paths given, line by line. The controller has not pre-read these files — that is your job, in your isolated subagent context.
+**CRITICAL:** Don't trust the implementer's report. **You** read the actual code at the paths given, line by line. The main agent has not pre-read these files — that is your job, in your isolated subagent context.
 
 **Order:** Always runs BEFORE code-quality reviewer. If spec-compliance fails, fix and re-review BEFORE code-quality.
 
 ---
 
+> type-general-purpose dispatch: Claude Code `Agent(general-purpose)` · Devin/Windsurf `run_subagent(subagent_general)` · OpenCode `@general` · Codex `spawn_agent` (`multi_agent=true`) · Antigravity `invoke_subagent(self)` · Pi `subagent` · unlisted → self-assess; no dispatch tool → main agent chooses inline.
+
 ```
-Dispatch subagent of type general (use your subagent/task tool):
+Dispatch subagent of type general-purpose (use your subagent/task tool):
   description: "Review spec compliance for slice {SLICE_NUMBER}"
   prompt: |
     You are reviewing whether an implementation matches the OpenSpec
@@ -145,7 +147,7 @@ Dispatch subagent of type general (use your subagent/task tool):
 
     All of the above are the **code-quality reviewer's** territory.
     If you find issues there, mention them in a brief note for the
-    controller's awareness but do NOT block on them. Naming consistency
+    main agent's awareness but do NOT block on them. Naming consistency
     flagged under Design-Violation is OK ONLY when `design.md`
     explicitly names the symbol (e.g., design says `verifyToken`, code
     uses `checkToken`).
@@ -180,7 +182,7 @@ Dispatch subagent of type general (use your subagent/task tool):
       Task-Incomplete | Missing-Requirement | Missing-Scenario |
       Out-of-Scope | Design-Violation | TDD-Discipline
 
-    Mark each issue clearly with its category. The controller's
+    Mark each issue clearly with its category. The main agent's
     handling: implementer fixes → re-review (you will be
     re-dispatched). After 3 cycles → STOP.
 
@@ -197,7 +199,7 @@ Dispatch subagent of type general (use your subagent/task tool):
 
 ---
 
-## Cap And Escalation (controller side)
+## Cap And Escalation (main agent side)
 
 ### 3-cycle cap handling
 

@@ -1,7 +1,7 @@
 ---
 name: openspec-plus-tasks
 description: "MANDATORY skill that activates whenever the OpenSpec tasks phase begins. Triggers: /opsx-new, /opsx-ff, or /opsx-continue runs; openspec-new-change, openspec-ff-change, openspec-continue-change, or openspec-explore is active; `openspec instructions tasks` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec tasks.md file."
-version: 1.1.0
+version: 1.1.1
 priority: high
 disable-user-invocation: true
 ---
@@ -199,7 +199,8 @@ Write to `outputPath` from Phase 0.
 
 ### 2.2 Artifact Compliance Review (MANDATORY — single-shot)
 
-Dispatch subagent of type `general` (use your subagent/task tool) with reviewer prompt below. Subagent loads tasks.md plus inputs into its own context, returns structured findings list, exits.
+Dispatch subagent of type `general-purpose` (use your subagent/task tool) with reviewer prompt below. Subagent loads tasks.md plus inputs into its own context, returns structured findings list, exits.
+> type-general-purpose dispatch: Claude Code `Agent(general-purpose)` · Devin/Windsurf `run_subagent(subagent_general)` · OpenCode `@general` · Codex `spawn_agent` (`multi_agent=true`) · Antigravity `invoke_subagent(self)` · Pi `subagent` · unlisted → self-assess; no dispatch tool → execute inline as self-check.
 
 **Discipline:**
 
