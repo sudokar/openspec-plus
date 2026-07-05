@@ -106,7 +106,7 @@ Display workflow phases via todowrite at start; update as phases complete. Add p
 
 ### Main Agent Context Hygiene (subagent mode ONLY)
 
-In subagent mode, the controller NEVER reads slice's affected source files — pass PATHS only. Subagents read files in their isolated context:
+In subagent mode, the main agent NEVER reads slice's affected source files — pass PATHS only. Subagents read files in their isolated context:
 
 * Implementer: pass affected file paths. Implementer reads them.
 * Spec-compliance reviewer: pass paths to changed files. Reviewer reads them.
@@ -183,7 +183,7 @@ How should the change be implemented?
 
 1. Subagent mode (Strongly Recommended — default for all changes) —
    fresh subagent per slice with two-stage review (spec-compliance then
-   code-quality), isolated context per slice, controller stays clean.
+   code-quality), isolated context per slice, main agent stays clean.
    This produces the highest quality output and is the recommended
    choice unless subagent dispatch is unavailable in your environment.
 

@@ -4,11 +4,11 @@ Dispatch the whole-change reviewer subagent at Phase 3 (after all slices `[x]`, 
 
 **Purpose:** Review entire change end-to-end as one diff — verify cross-slice integration, surface design issues revealed by implementation, apply implementation principles at change scope.
 
-**Out of scope:** spec/design alignment (that's `openspec-verify-change`). **Reviewer reads everything itself** — controller passes artifact paths and all changed file paths; reviewer opens artifacts and runs `git diff HEAD`, falling back to reading files directly if git unavailable.
+**Out of scope:** spec/design alignment (that's `openspec-verify-change`). **Reviewer reads everything itself** — main agent passes artifact paths and all changed file paths; reviewer opens artifacts and runs `git diff HEAD`, falling back to reading files directly if git unavailable.
 
 ---
 
-> type-general-purpose dispatch: Claude Code `Agent(general-purpose)` · Devin/Windsurf `run_subagent(subagent_general)` · OpenCode `@general` · Codex `spawn_agent` (`multi_agent=true`) · Antigravity `invoke_subagent(self)` · Pi `subagent` · unlisted → self-assess; no dispatch tool → controller chooses inline.
+> type-general-purpose dispatch: Claude Code `Agent(general-purpose)` · Devin/Windsurf `run_subagent(subagent_general)` · OpenCode `@general` · Codex `spawn_agent` (`multi_agent=true`) · Antigravity `invoke_subagent(self)` · Pi `subagent` · unlisted → self-assess; no dispatch tool → main agent chooses inline.
 
 ```
 Dispatch subagent of type general-purpose (use your subagent/task tool):
@@ -26,7 +26,7 @@ Dispatch subagent of type general-purpose (use your subagent/task tool):
 
     ## Artifacts
 
-    Open and read completely (paths only — controller has NOT pre-read
+    Open and read completely (paths only — main agent has NOT pre-read
     them for you; you read them in this isolated subagent context):
 
     * Proposal: {PROPOSAL_PATH}
@@ -38,7 +38,7 @@ Dispatch subagent of type general-purpose (use your subagent/task tool):
 
     Changed files (all slices combined): {CHANGED_FILE_PATHS}
 
-    Run `git diff HEAD -- {CHANGED_FILE_PATHS}` yourself. Controller
+    Run `git diff HEAD -- {CHANGED_FILE_PATHS}` yourself. Main agent
     has NOT pre-read the diff. Read the entire diff — cumulative
     output of every slice. If git is unavailable, read each file
     directly and note the fallback in your report.
@@ -122,7 +122,7 @@ Dispatch subagent of type general-purpose (use your subagent/task tool):
 
 ---
 
-## Cap And Escalation (controller side)
+## Cap And Escalation (main agent side)
 
 | Cycle | Action |
 |---|---|

@@ -4,7 +4,7 @@ Dispatch an implementer subagent for one OpenSpec change slice.
 
 **Purpose:** Implement one slice (`## N. <Name>` group from `tasks.md`) end-to-end under strict TDD via the `openspec-plus-tdd` skill, applying the four implementation principles.
 
-**Discipline (controller side):**
+**Discipline (main agent side):**
 
 * NEVER make subagent read `tasks.md` — paste full slice text below.
 * NEVER inherit session history — subagent gets ONLY this prompt.
@@ -12,7 +12,7 @@ Dispatch an implementer subagent for one OpenSpec change slice.
 
 ---
 
-> type-general-purpose dispatch: Claude Code `Agent(general-purpose)` · Devin/Windsurf `run_subagent(subagent_general)` · OpenCode `@general` · Codex `spawn_agent` (`multi_agent=true`) · Antigravity `invoke_subagent(self)` · Pi `subagent` · unlisted → self-assess; no dispatch tool → controller chooses inline.
+> type-general-purpose dispatch: Claude Code `Agent(general-purpose)` · Devin/Windsurf `run_subagent(subagent_general)` · OpenCode `@general` · Codex `spawn_agent` (`multi_agent=true`) · Antigravity `invoke_subagent(self)` · Pi `subagent` · unlisted → self-assess; no dispatch tool → main agent chooses inline.
 
 ```
 Dispatch subagent of type general-purpose (use your subagent/task tool):
@@ -64,7 +64,7 @@ Dispatch subagent of type general-purpose (use your subagent/task tool):
 
     ## Affected Files
 
-    Slice expected to touch (PATHS ONLY — read them yourself, do not assume the controller pre-read them):
+    Slice expected to touch (PATHS ONLY — read them yourself, do not assume the main agent pre-read them):
 
     {AFFECTED_FILES}
 
@@ -225,7 +225,7 @@ Dispatch subagent of type general-purpose (use your subagent/task tool):
 
     ## DO NOT
 
-    * Mark tasks `[x]` in `tasks.md` — controller does that AFTER
+    * Mark tasks `[x]` in `tasks.md` — main agent does that AFTER
       external reviewers approve. Just report what you implemented.
     * Modify `spec.md` or `design.md` — escalate via BLOCKED if gaps.
     * Commit code — vanilla openspec doesn't commit; this skill doesn't.
