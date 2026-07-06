@@ -1,7 +1,7 @@
 ---
 name: openspec-plus-proposal
 description: "MANDATORY skill that activates whenever the OpenSpec proposal phase begins. Triggers: /opsx-new, /opsx-ff, or /opsx-continue runs; openspec-new-change, openspec-ff-change, openspec-continue-change, or openspec-explore is active; `openspec instructions proposal` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec proposal."
-version: 1.1.1
+version: 1.2.0
 priority: high
 disable-user-invocation: true
 ---
@@ -76,9 +76,14 @@ Display workflow phases via task tool at start; update as each phase completes.
    - Missing or older than 7 days → continue:
      - Fetch `https://raw.githubusercontent.com/sudokar/openspec-plus/main/VERSION`
      - Compare with `openspec/.plus/VERSION` (local)
-     - If remote > local → display: `🔔 OpenSpec Plus update available (v{remote} → you have v{local}). Run install prompt: https://github.com/sudokar/openspec-plus#install--update`
+     - If remote > local → **prompt the user** using the question tool:
+       > 🔔 OpenSpec Plus **v{remote}** is available (you have **v{local}**).
+       - Option 1: **Upgrade (Recommended)**
+       - Option 2: **Upgrade later**
+       - If user selects **Upgrade** → display the install/update link: `https://github.com/sudokar/openspec-plus#-install--update` and STOP. Do NOT continue to Phase 0 — the user should run the install/update prompt first and restart the session.
+       - If user selects **Upgrade later** → proceed to Phase 0 normally.
      - Write current timestamp to `openspec/.plus/last-update-check`
-2. Network/file errors → silently continue. Notification only — do NOT auto-install.
+2. Network/file errors → silently continue. NEVER block the workflow for network issues — proceed to Phase 0.
 
 Mark Phase -1 complete, proceed to Phase 0.
 
