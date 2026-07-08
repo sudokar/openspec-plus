@@ -1,7 +1,7 @@
 ---
 name: openspec-plus-tdd
-description: "MANDATORY skill that activates whenever code is written to implement an OpenSpec change task. Triggers: openspec-plus-apply is active, /opsx-apply is running, the user is implementing tasks from an OpenSpec change, an implementer subagent dispatched by openspec-plus-apply is starting work, or the user invokes phrases like 'TDD for the change', 'implementing change tasks', or 'writing tests for spec scenarios'. Load before any production code is written for an OpenSpec change. Enforces strict RED-GREEN-REFACTOR per test (any test — acceptance, unit, edge case, helper). Iron Law: NO PRODUCTION CODE WITHOUT A FAILING TEST. Gherkin scenarios in spec.md are the canonical source for acceptance tests (every scenario MUST become at least one test); additional unit, edge-case, and helper tests are encouraged and follow the same per-test cycle."
-version: 1.0.1
+description: "MANDATORY skill that activates whenever code is written to implement an OpenSpec change task. Triggers: openspec-plus-apply is active, /opsx-apply is running, the user is implementing tasks from an OpenSpec change, an implementer subagent dispatched by openspec-plus-apply is starting work, or the user invokes phrases like 'TDD for the change', 'implementing change tasks', or 'writing tests for spec scenarios'. Load before any production code is written for an OpenSpec change. Enforces strict RED-GREEN-REFACTOR per test (acceptance, unit, edge case, helper, error path). Iron Law: NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST. Gherkin scenarios in spec.md define requirements that must be covered; additional tests discovered during implementation follow the same per-test cycle and become mandatory once identified."
+version: 1.1.0
 priority: high
 disable-user-invocation: true
 ---
@@ -12,7 +12,7 @@ disable-user-invocation: true
 
 Strict RED-GREEN-REFACTOR per test for OpenSpec change implementation. Every test — whether derived from a Gherkin scenario relevant to the slice in `spec.md`, written for a unit, edge case, helper, or error path — goes through its own atomic cycle before the next test begins. Production code exists only to make a previously-failing test pass. Surgical changes, simplicity first, no speculative abstractions, every changed line traces to a slice task.
 
-Gherkin scenarios in `spec.md` are the **canonical source for acceptance tests**: every scenario relevant to the slice MUST become at least one test. The implementer is encouraged to add additional tests — unit tests for individual functions, edge-case tests, helper tests, error-path tests — when fast-feedback granularity is valuable. Every test follows the same cycle.
+Gherkin scenarios in `spec.md` define the **requirements** the slice must satisfy. They guide what to test but do not limit the test set — the implementer writes every valid test (acceptance, unit, edge case, helper, error path) discovered during implementation. Tests are not fully enumerated upfront; they emerge incrementally as production code takes shape. Every Gherkin scenario must be covered by the end, but granular tests discovered along the way are equally mandatory. Every test follows the same cycle.
 
 Loaded by `openspec-plus-apply` (subagent prompt + inline mode) before any code is written.
 
@@ -57,13 +57,31 @@ NO PRODUCTION CODE WITHOUT A FAILING TEST
 
 Every test — acceptance, unit, edge case, helper, error path — must be observed to fail for the right reason before the production code that makes it pass is written. Test not observed to fail = test proves nothing. Code written first = delete it, start over. No exceptions without explicit user permission.
 
-### Mandatory Acceptance Coverage
+### Mechanical Constraint: One Test Per Edit
 
-Every Gherkin scenario relevant to the slice in `spec.md` MUST become at least one test. The scenario IS the acceptance contract; the test IS the verification. A slice cannot ship with an uncovered scenario, even if all other tests pass.
+"One test at a time" is a mechanical rule, not a guideline:
 
-### Encouraged Granular Coverage
+* Each edit to a test file MUST introduce **exactly one** new test function/block (`test()`, `it()`, `t.Run()`, `def test_`, etc.).
+* If you are about to write an edit that adds 2 or more new test blocks — **STOP. You are batching.** It does not matter that the tests "correspond to scenarios" or are "in order." Split the edit into separate cycles.
+* After each single-test edit, you MUST run the test suite and observe the failure before writing any production code. Then complete GREEN and REFACTOR for that one test before editing the test file again.
+* "Building up the test suite" is not a justification. The suite grows by exactly one test per cycle. There is no shortcut.
+* Writing tests "in order" does not equal TDD. TDD means each test is RED → GREEN → REFACTOR **individually** before the next test is written.
 
-Beyond acceptance tests, add unit/edge/helper/error tests when valuable (non-trivial branches, null/empty inputs, boundary values, error paths). Same RED-GREEN-REFACTOR cycle — no special handling regardless of test origin.
+**Litmus test before every test-file edit:** Count the new `test()` / `it()` / `t.Run()` / `def test_` blocks you are about to add. If the count is not exactly 1, delete and rewrite.
+
+### Mechanical Constraint: Only the Failing Test's Code Path
+
+Each edit to production code MUST introduce **only the code path that the current failing test exercises**. Before writing production code, ask: "Which branch, condition, or logic does the failing test's assertion require?" Write that and nothing else.
+
+* If the failing test asserts a valid-login response, write only the valid-login path — do not also write the invalid-login path, the rate-limit path, or the session-expiry path.
+* If the failing test asserts a specific error message, write only the code that produces that error — do not also handle other error cases.
+* Every line of production code you write must be necessary for the current failing test to pass. Lines not necessary for the current test are speculative — delete them.
+
+**Litmus test before every production-code edit:** For each line you are about to write, ask "if I remove this line, does the current test's assertion still fail for the same reason?" If yes — the line is unnecessary for this test. Remove it; it belongs in a future cycle.
+
+### Test Coverage
+
+Every Gherkin scenario relevant to the slice in `spec.md` must be covered by at least one test — but Gherkin scenarios are requirements, not a ceiling. Unit, edge-case, helper, and error-path tests discovered during implementation are equally mandatory once identified. The test set grows incrementally: after each RED-GREEN-REFACTOR cycle, ask "what is the next test this code needs?" — which may be the next Gherkin scenario or a granular test the current cycle revealed. Same cycle for every test, regardless of origin.
 
 ---
 
@@ -84,17 +102,17 @@ NEVER read source outside the slice's affected files.
 ```text
 Phase 0: Pre-RED — read project's coding/testing conventions; follow strictly
 
-Phase 1+: Plan the test set for the slice:
-  Mandatory:  one test per Gherkin scenario relevant to the slice in spec.md
-  Encouraged: additional unit / edge-case / helper / error-path tests
-              when fast-feedback granularity is valuable
+Phase 1: Read Gherkin scenarios in spec.md to understand requirements.
+  Identify the first test to write — typically the simplest Gherkin
+  scenario or the smallest unit of behavior. Do NOT enumerate all
+  tests upfront; the full test set emerges incrementally.
 
-Phase 2+: For each test, ONE AT A TIME (any test, in any order):
-  Follow the Per-Test State Machine (digraph below) atomically.
+Phase 2+: For each test, ONE AT A TIME:
   Do NOT begin the next test until the current one terminates at
-  "Test Complete".
+  "Test Complete". After each cycle, decide the next test: the next
+  uncovered Gherkin scenario, or a granular test this cycle revealed.
 
-After all tests complete AND every Gherkin scenario relevant to the slice is covered, run
+After all tests complate, requirements are met AND no further tests are needed, run
 the slice's pre-mark gate.
 ```
 
@@ -102,7 +120,7 @@ the slice's pre-mark gate.
 
 Every test traverses this cycle end-to-end before work begins on the next. Atomic per test — no shortcuts, no batching, no skipping nodes. Applies to all test types (acceptance and granular).
 
-**Per-test cycle:** START → RECORD STATE BEFORE (file path + count + names) → RED (write ONE failing test K) → VERIFY-RED (fails for expected reason? no → fix test, retry) → GREEN (minimum production code for K only) → VERIFY-GREEN (K passes, others green, output pristine? no → fix production code, retry) → REFACTOR ASSESS (needed? yes → act, verify green, revert if broken; no → record "not needed — reason") → RECORD STATE AFTER (count = previous + 1) → TEST K COMPLETE → return to START for K+1 (or end if all done AND all Gherkin scenarios covered).
+**Per-test cycle:** START → RECORD STATE BEFORE (file path + count + names) → RED (write ONE failing test K) → VERIFY-RED (fails for expected reason? no → fix test, retry) → GREEN (minimum production code for K only) → VERIFY-GREEN (K passes, others green, output pristine? no → fix production code, retry) → REFACTOR ASSESS (needed? yes → act, verify green, revert if broken; no → record "not needed — reason") → RECORD STATE AFTER (count = previous + 1) → TEST K COMPLETE → return to START for K+1 (or end if all Gherkin scenarios covered AND no further tests needed).
 
 The cycle forbids:
 
@@ -183,7 +201,7 @@ These files are the contract — follow every documented rule strictly, end-to-e
 
 The test you write at this phase is one of two kinds:
 
-**1. Acceptance test — translated from a Gherkin scenario (mandatory coverage).**
+**1. Acceptance test — derived from a Gherkin scenario requirement.**
 
 A Gherkin scenario in `spec.md`:
 
@@ -209,7 +227,7 @@ test('logs in with valid credentials', async () => {
 });
 ```
 
-**2. Granular test — implementer-initiated for a unit, edge case, helper, or error path (encouraged when valuable).**
+**2. Granular test — discovered during implementation for a unit, edge case, helper, or error path.**
 
 Example: while implementing the login above, the implementer factors out a `mapAuthError` helper. They add a unit test for it:
 
@@ -239,22 +257,34 @@ Run the test. Confirm:
 2. Failure message matches what scenario implies.
 3. Failure is because feature is missing — not typo, not missing import, not setup bug.
 
-Test passes immediately → feature exists or test is wrong. Fix the test.
-Test errors → fix error, re-run until it fails for the expected reason.
+Test passes immediately → either the test is wrong, or a prior GREEN over-produced code that already covers this case. Investigate which: if the test is valid and prior production code already satisfies it, this is a TDD violation in the earlier cycle. Return to that earlier GREEN, remove the unnecessary production code, and re-run until the current test is RED for the right reason. Do NOT accept accidental coverage and move on.
+Test errors (compilation failure, missing type, unresolved import) → add **only the minimum scaffolding** to make the test compile and run: stub functions that return zero/empty values, empty types/interfaces, missing imports. Scaffolding has no logic, no branching, no real behavior — just enough structure for the test to execute and fail for the behavioral reason. Re-run until the test fails with the expected assertion message, then stop — Phase 3 (GREEN) is where real production code begins.
 
 ---
 
 ## Phase 3: GREEN — Minimum Production Code
 
-Simplest code that passes the test.
+Write **only the minimum production code necessary to make the current failing test pass** — not the whole code path you expect the feature will eventually need.
 
-* No features beyond what the failing scenario requires
+Execute GREEN in this order:
+
+1. State the current test's **single missing behavior** in one sentence.
+2. State the exact branch, condition, helper, or line(s) you are about to add, and why each is necessary for this test.
+3. Add only those line(s), then run the current test.
+4. If the current test passes, continue to VERIFY-GREEN. If a later test turns GREEN on its first run because of this edit, treat that as automatic over-production and revise the earlier production edit until the later test is RED for the right reason.
+
+* Only the branch/logic the current test's assertion requires — if the test checks a valid login, do not also write the invalid-login branch
+* No features beyond what the failing test exercises
 * No abstractions for single-use code
-* No flexibility/configuration the scenario didn't ask for
-* No error handling for impossible cases
+* No flexibility/configuration the test didn't ask for
+* No error handling for cases the test doesn't cover
 * Match existing patterns
 
-If 200 lines and 50 would do — rewrite.
+If you are writing code because "the next test will need it," STOP. That code belongs in the next cycle, not this one.
+
+If multiple new lines are needed, each line must satisfy the necessity check from the Mechanical Constraint above. If any line is not required for the current test to go GREEN, do not write it.
+
+If the next test passes immediately after this GREEN, you over-produced here. The code you wrote covered more than the current test required. This is a TDD violation, not an efficiency win. Remove the extra code and restore the missing RED.
 
 ---
 
@@ -274,35 +304,43 @@ Unrelated tests fail → fix now, before next test.
 
 ## Phase 5: REFACTOR — Mandatory Assessment, Conditional Action
 
-REFACTOR is NOT optional. After every GREEN, you MUST perform an explicit refactor assessment.
+REFACTOR is NOT optional. After every GREEN, you MUST perform an explicit refactor assessment on **both test and production code** introduced or modified in this cycle (within the slice's files only).
 
-### 5.1 Assessment (always)
+### 5.1 Assessment (always — no cherry-picking)
 
-Apply clean code principles, project conventions (from Phase 0 reading), and look for common code smells in the code introduced by this test's GREEN phase (within the slice's files only).
+Enumerate, then judge. Do not skip categories or pick only the obvious ones.
 
-Answer in the report: **Is refactoring needed?** (yes/no with one-sentence reason)
+1. **Enumerate applicable clean code principles** — e.g. single responsibility, meaningful names, small focused functions, DRY, least surprise, command-query separation. List which apply to the code touched in this cycle.
+2. **Enumerate applicable refactoring patterns** — e.g. extract method/function, inline variable, rename, replace conditional with polymorphism, introduce parameter object, pull up/push down. List which could apply.
+3. **Enumerate applicable code smells** — e.g. duplication, long method, feature envy, data clumps, primitive obsession, shotgun surgery, speculative generality. List any present.
+4. **Check against project conventions** — re-read Phase 0 conventions. List any deviations in test or production code.
 
-If **no** → state explicitly: *"Refactor assessment: no refactoring needed — code is minimal, clear, and non-duplicative."* Then move to NEXT.
+Assess each enumerated item across both test and production code touched in this cycle. For each item, state: applies / does not apply, and if applies, whether action is needed.
+
+Answer in the report: **Is refactoring needed?** (yes/no with one-sentence reason per finding)
+
+If **no** → state explicitly: *"Refactor assessment: no refactoring needed — [reason]."* Then move to NEXT.
 
 If **yes** → proceed to 5.2.
 
 ### 5.2 Action (only if assessment = yes)
 
-Refactor respecting project conventions. Tests must stay green — run after every edit. NEVER add behavior, touch outside slice, or reformat adjacent code. If tests break → revert.
+Refactor test and/or production code respecting project conventions. Tests must stay green — run after every edit. NEVER add behavior, touch outside slice, or reformat adjacent code. If tests break → revert.
 
-Record outcome (e.g., *"Extracted `parseAuthHeader` helper; tests green"* or *"No refactoring needed — minimal, clear, non-duplicative"*).
+Record outcome (e.g., *"Extracted `parseAuthHeader` helper; renamed test to match convention; tests green"* or *"No refactoring needed — minimal, clear, non-duplicative"*).
 
 ---
 
 ## Phase 6: NEXT — Only Now
 
-Only after the current test's REFACTOR assessment is recorded, move to the next test. Return to Phase 1 RED with the next test (the next uncovered Gherkin scenario, OR the next implementer-initiated unit/edge/helper/error test).
+Only after the current test's REFACTOR assessment is recorded, decide the next test. Ask: "What is the next test this code needs?" — the answer may be the next uncovered Gherkin scenario, or a unit/edge/error test that the current cycle revealed (e.g., a helper with an untested null path, a branch with no coverage). Return to Phase 1 RED with that test.
 
 NEVER skip ahead. NEVER write the next test while the current one is still in GREEN or REFACTOR phase.
 
 The slice is done when:
-* Every Gherkin scenario in spec.md has at least one passing test (mandatory acceptance coverage), AND
-* Every test the implementer added (unit, edge, helper, error) is passing, AND
+* Every Gherkin scenario in spec.md has at least one passing test, AND
+* Every test discovered during implementation is passing, AND
+* No further tests are needed (no untested branches, edge cases, or error paths remain), AND
 * All tests went through the per-test cycle individually.
 
 ---
@@ -333,7 +371,7 @@ Code explains itself through good names, small focused functions, and clear stru
 
 **Per-test:** Pre-RED done ✓ RED observed ✓ GREEN passes + others green + pristine ✓ Minimum code ✓ No unnecessary comments ✓ No adjacent code touched ✓ REFACTOR assessed ✓ — Cannot check all? Restart from RED.
 
-**Per-slice:** Every Gherkin scenario covered ✓ All tests pass ✓ Each test went through its own cycle (no batching) ✓
+**Per-slice:** Every Gherkin scenario covered ✓ All discovered tests pass ✓ No untested branches/edge cases/error paths remain ✓ Each test went through its own cycle (no batching) ✓
 
 ---
 
@@ -354,7 +392,7 @@ Code explains itself through good names, small focused functions, and clear stru
 
 ## Anti-Patterns
 
-NEVER: skip Pre-RED reading | batch tests | move to next test before current REFACTOR | skip REFACTOR assessment | production code before failing test | test after code works ("for coverage") | `.skip`/`.todo`/`xtest`/comment-out | suppress output | add comments on non-complex logic | leave TODO/FIXME/commented-out code | refactor adjacent code | features the test didn't request | abstractions for single use | error handling for untested cases | skip scenario tests | skip granular tests when edge cases exist | continue with failing tests | commit code.
+NEVER: skip Pre-RED reading | batch tests | move to next test before current REFACTOR | skip REFACTOR assessment | production code before failing test | test after code works ("for coverage") | `.skip`/`.todo`/`xtest`/comment-out | suppress output | add comments on non-complex logic | leave TODO/FIXME/commented-out code | refactor adjacent code | features the test didn't request | abstractions for single use | error handling for untested cases | code written because a future test will need it | code that makes the next test pass during the current GREEN | skip scenario tests | skip granular tests when edge cases exist | continue with failing tests | commit code.
 
 "Just this once" → STOP. Restart from RED.
 
@@ -371,6 +409,6 @@ The slice's pre-mark gate (lint + format + tests + other on affected files) runs
 
 ## Success Criteria
 
-**Succeeds:** Pre-RED done, every Gherkin scenario has a passing test, every test observed to fail before passing, full per-test cycle completed before starting next, REFACTOR assessed and recorded for each, minimal production code, pristine output, no unnecessary comments, no adjacent refactoring, gate clean.
+**Succeeds:** Pre-RED done, every Gherkin scenario has a passing test, all discovered tests pass, no untested branches/edge cases remain, every test observed to fail before passing, full per-test cycle completed before starting next, REFACTOR assessed and recorded for each, minimal production code (only current test's code path per GREEN), pristine output, no unnecessary comments, no adjacent refactoring, gate clean.
 
-**Fails:** Pre-RED skipped, batching, next test before current REFACTOR complete, REFACTOR assessment skipped, production code without red-then-green test, tests skipped/commented, comments on obvious code, adjacent code touched, speculative abstractions, scenario paraphrased instead of translated, uncovered scenarios.
+**Fails:** Pre-RED skipped, batching, next test before current REFACTOR complete, REFACTOR assessment skipped, production code without red-then-green test, production code covering future tests in current GREEN, tests skipped/commented, comments on obvious code, adjacent code touched, speculative abstractions, scenario paraphrased instead of translated, uncovered scenarios, untested branches/edge cases ignored.

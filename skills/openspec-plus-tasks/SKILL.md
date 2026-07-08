@@ -1,7 +1,7 @@
 ---
 name: openspec-plus-tasks
 description: "MANDATORY skill that activates whenever the OpenSpec tasks phase begins. Triggers: /opsx-new, /opsx-ff, or /opsx-continue runs; openspec-new-change, openspec-ff-change, openspec-continue-change, or openspec-explore is active; `openspec instructions tasks` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec tasks.md file."
-version: 1.1.1
+version: 1.2.0
 priority: high
 disable-user-invocation: true
 ---
@@ -23,11 +23,8 @@ Two anchors that shape every task group:
 
 **Red flags — STOP, you are about to violate this skill:**
 
-- "I'll group by layer (DB / API / UI) to keep similar tech together"
-- "This task group is preparatory work, it doesn't need to be testable on its own"
 - "I'll add a 'Files' or 'Dependencies' section to the tasks.md"
 - "I should peek at the code to figure out what files to touch"
-- "Let me put exact code or shell commands in the task description"
 - "The reviewer subagent isn't needed, the tasks look fine to me"
 - "Reviewer flagged minor issues, I'll re-dispatch after fixing to confirm"
 - "I'll add commit instructions per task"
@@ -82,13 +79,11 @@ Display workflow phases via task tool at start; update as each phase completes.
 
 ## Core Principles
 
-- **Vertical Slice Per Group** — each `## N.` heading is one vertical slice (feature/capability that produces a testable end-to-end outcome), NOT a layer (DB/API/UI), NOT a phase (setup/build/polish), NOT a category (tests/docs/config).
-- **Testable Outcome Per Group** — after the last `- [ ]` in a group is checked, the user can verify something works in one sentence; if not, merge with the slice that completes the outcome or surface as a design gap.
-- **Verifiable Tasks** — each task small enough that "done" is unambiguous; no "implement appropriately", "handle edge cases", "make it work".
-- **Dependency Order Across Slices** — order so each slice's prerequisites are satisfied by earlier slices; within-slice dependencies managed by task ordering inside the group.
-- **YAGNI — No Speculative Tasks** — every task traces to a spec requirement, design decision, or stakeholder need.
-- **Respect Project Standards** — read project instruction files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, equivalents) at Phase 1 start; tasks MUST follow project conventions (paths, naming, structure); conflicts → surface to user, never silently override.
-- **Implementation Discipline Belongs Elsewhere** — this skill produces a clean, sliced, verifiable task list; nothing more.
+- **Slice** — each `## N.` heading is a vertical slice: a feature or capability that, when all its tasks are done, produces one end-to-end testable outcome expressible in a single sentence. The slice heading implies the outcome. A slice spans whatever layers are needed (DB, API, UI, CLI). Slices are dependency-ordered — each slice's prerequisites are satisfied by earlier slices.
+- **Task** — each `- [ ]` item is a capability the implementer delivers in one work session. A task operates at the spec **requirement** level, not the **scenario** level. It names the capability and summarizes the behavioral facets the implementer must deliver. The spec's Gherkin scenarios are the implementer's test cases during TDD — the task points to the capability; the spec holds the individual test cases. "Done" is unambiguous from the task description alone.
+- **WHAT, not HOW** — tasks state what behavior to deliver. The design document holds how: method signatures, struct fields, trait members, wiring steps, data layouts, file creation sequences. The implementer reads the design for architectural guidance and discovers code through TDD. File paths may appear inline to orient (e.g., "Add stream validation to `src/kinesis/handler.rs`") but never as step-by-step choreography.
+- **Behavior only** — each task describes a behavior the system exhibits after implementation. Not infrastructure to create before any behavior uses it. Not a process step to run (gate, test suite, build, codegen command). Infrastructure emerges as the implementer delivers behavior through TDD. Verification is the implementer's responsibility per the TDD cycle.
+- **Traceability** — every task traces to a spec requirement, design decision, or stakeholder need. No speculative tasks. Follow project conventions (read `AGENTS.md`, `CLAUDE.md`, equivalents at Phase 1 start; conflicts → surface to user, never silently override).
 
 ---
 
@@ -179,7 +174,7 @@ Following the template from Phase 0, write:
 
 - [ ] 1.1 <Task — references file paths inline where useful>
 - [ ] 1.2 <Task — verifiable, small enough for one work session>
-- [ ] 1.3 <Final task that completes the testable outcome for this slice>
+- [ ] 1.3 <Task>
 
 ## 2. <Second Vertical Slice>
 
@@ -187,13 +182,10 @@ Following the template from Phase 0, write:
 - [ ] 2.2 <Task>
 ```
 
-Rules:
+Every task must satisfy the Core Principles above. Additionally:
 
-* File paths go inline in task descriptions (e.g., "Add validation to `src/auth/middleware.ts`")
-* Each task is verifiable
-* Each task small enough for one work session
-* Last task in a group makes the testable outcome verifiable
-* No code, no shell commands, no commit messages, no expected output
+* Preserve template format — no custom sections (Files, Dependencies, Notes, Acceptance)
+* No code snippets, shell commands, commit messages, or expected output in task descriptions
 
 Write to `outputPath` from Phase 0.
 
@@ -226,17 +218,10 @@ Read all inputs before reviewing. Check each category:
 
 | Category | What to look for |
 |---|---|
-| Vertical slicing | Every `## N.` group is a feature/capability slice — NOT a layer (DB/API/UI), NOT a phase (setup/build/polish), NOT a category (tests/docs/config) |
-| Testable outcomes | Each group's last task makes a one-sentence outcome verifiable end-to-end |
-| Spec coverage | Every spec requirement maps to at least one task |
-| Design coverage | Every design decision or component maps to at least one task |
-| Naming consistency | Same component or capability named the same way across all tasks |
-| Format compliance | Artifact structure matches the provided template — no custom sections, no extra nesting, no deviations |
-| No implementation detail | No code snippets, no exact shell commands, no commit messages, no expected output |
-| Placeholder scan | No TBD, TODO, "[fill in]", "implement appropriately", "handle edge cases", "make it work" |
-| Verifiability | Each task description tells you when it's done |
-| Dependency order | Slices ordered so prerequisites are satisfied by earlier slices |
-| Speculative work | No tasks for unrequested features, "while we're at it" additions, or just-in-case work |
+| Slice discipline | Every `## N.` group is a vertical slice whose heading implies a one-sentence testable outcome. Not a layer (DB/API/UI), phase (setup/polish), or category (tests/docs). Slices are dependency-ordered |
+| Task discipline | Every task operates at the spec requirement level, not the scenario level — it names a capability and summarizes its behavioral facets. A task that restates a single Gherkin scenario is too granular; the spec already holds that detail. The design holds HOW; tasks state WHAT |
+| Coverage | Every spec requirement and design decision maps to at least one task; no speculative tasks for unrequested features |
+| Naming & format | Same component named consistently across tasks. Artifact structure matches template — no custom sections, no extra nesting. No code, shell commands, commit messages, TBD/TODO placeholders |
 
 Calibration: only flag issues that would mislead implementation, lose
 coverage, or break the slicing discipline. Minor wording polish is NOT an issue.
@@ -271,6 +256,6 @@ NEVER write code, exact shell commands, expected output, or commit messages in t
 
 ## Success Criteria
 
-**Succeeds:** every group is a vertical slice with testable outcome, every spec/design item covered, tasks verifiable + dependency-ordered + consistently named, template format preserved, reviewer dispatched once with findings applied.
+**Succeeds:** every group satisfies the Slice principle, every task satisfies the Task + WHAT-not-HOW + Behavior-only principles, spec and design coverage complete, template format preserved, reviewer dispatched once with findings applied.
 
-**Fails:** groups are layers/phases/categories, no testable outcome, format diverges from template, code read in root, reviewer skipped/re-dispatched, coverage gaps, speculative tasks, implementation discipline in tasks.md.
+**Fails:** any principle violated, reviewer skipped or re-dispatched, coverage gaps, source code read in root context.

@@ -80,14 +80,13 @@ Dispatch subagent of type general-purpose (use your subagent/task tool):
 
     Cross-task refactoring concerns:
 
-    * **Duplicate logic** — same or near-same code across tasks
-      MUST be extracted into shared utility.
-    * **Naming drift** — same concept named differently across
-      tasks MUST be unified.
-    * **Missed shared abstractions** — repeated patterns across
-      tasks. Flag them.
-    * **Dead code** — earlier-task code superseded but not
-      removed. Flag it.
+    a. Enumerate applicable clean code principles
+    b. Enumerate applicable refactoring patterns
+    c. Enumerate applicable code smells
+    d. Check against project conventions
+
+    Assess each enumerated item across task boundaries.
+    No cherry-picking — list then judge.
 
     Implementation principles concerns:
 

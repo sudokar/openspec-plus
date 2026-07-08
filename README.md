@@ -19,7 +19,7 @@
 <p align="center">
   <a href="https://github.com/sudokar/openspec-plus/stargazers"><img src="https://img.shields.io/github/stars/sudokar/openspec-plus?style=social" alt="GitHub Stars" /></a>
   &nbsp;
-  <img src="https://img.shields.io/badge/version-1.3.0-blue" alt="Version" />
+  <img src="https://img.shields.io/badge/version-1.4.0-blue" alt="Version" />
   &nbsp;
   <img src="https://img.shields.io/github/license/sudokar/openspec-plus" alt="License" />
 </p>
@@ -30,18 +30,29 @@
 
 [OpenSpec](https://github.com/Fission-AI/OpenSpec) defines the workflow. OpenSpec Plus enforces the structure and discipline. It's designed to fit into the existing OpenSpec workflow rather than replace it.
 
-| Phase | Without Plus | With Plus |
-|---|---|---|
-| 🔍 **Proposal** | Agent jumps to solutions; scope creep starts immediately | Right problem scoped through structured discovery before any solution work |
-| 📋 **Spec** | Vague requirements; nothing testable; "done" is subjective | Unambiguous requirements with testable acceptance scenarios |
-| 🏗️ **Design** | First idea gets used; user doesn't own the decision | Alternatives explored with trade-offs; user chooses the direction |
-| 🗂️ **Tasks** | Grouped by tech layer; no testable outcome per group | Vertical slices where each group delivers something the user can verify |
-| ⚡ **Apply** | No spec verification; failing tests skipped; issues silently fixed in code | Spec-verified, quality-gated per slice; failures escalated, never bypassed |
-| 🧪 **TDD** | Tests are optional or an afterthought — doesn't exist in vanilla | Every line of production code justified by a failing test first |
-
-Works with any AI coding agent: **OpenCode** · **Claude Code** · **Windsurf** · **Cursor** · **GitHub Copilot** · **Antigravity** · **Pi Code** · and others.
+| Phase           | Without Plus                                                               | With Plus                                                                  |
+| --------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| 🔍 **Proposal** | Agent jumps to solutions; scope creep starts immediately                   | Right problem scoped through structured discovery before any solution work |
+| 📋 **Spec**     | Vague requirements; nothing testable; "done" is subjective                 | Unambiguous requirements with testable acceptance scenarios                |
+| 🏗️ **Design**   | First idea gets used; user doesn't own the decision                        | Alternatives explored with trade-offs; user chooses the direction          |
+| 🗂️ **Tasks**    | Grouped by tech layer; no testable outcome per group                       | Vertical slices where each group delivers something the user can verify    |
+| ⚡ **Apply**    | No spec verification; failing tests skipped; issues silently fixed in code | Spec-verified, quality-gated per slice; failures escalated, never bypassed |
+| 🧪 **TDD**      | Tests are optional or an afterthought — doesn't exist in vanilla           | Every line of production code justified by a failing test first            |
 
 If this resonates, ⭐ [star the repo](https://github.com/sudokar/openspec-plus) — it helps others discover it and keeps the project going.
+
+Supported AI coding agents:
+
+| Agent              | Supported |
+| ------------------ | --------- |
+| **Claude Code**    | ✅        |
+| **OpenCode**       | ✅        |
+| **Windsur/Devin**  | ✅        |
+| **Cursor**         | ✅        |
+| **GitHub Copilot** | ✅        |
+| **Antigravity**    | ✅        |
+| **Pi Code**        | ✅        |
+| Others             | ✅        |
 
 ---
 
@@ -156,8 +167,8 @@ OpenSpec Plus improves continuously. Here's how to stay in the loop:
 
 - ⭐ **Star this repo** — helps others discover it and bookmarks it for
   you: [sudokar/openspec-plus](https://github.com/sudokar/openspec-plus)
-- 🔔 **Auto-check** *(recommended)* — skills automatically check for updates weekly and notify you in-session; just
-  re-run the install prompt when prompted
+- 🔔 **Auto-check** _(recommended)_ — proposal skill automatically check for updates weekly and notify you in-session; just
+  re-run the install/update prompt when prompted
 - 👁️ **GitHub Watch** — click **Watch → Custom → Pull requests** to get notified when new features ship
 - 📝 **Changelog** — check [CHANGELOG.md](CHANGELOG.md) periodically to see what's new
 
@@ -168,17 +179,20 @@ OpenSpec Plus improves continuously. Here's how to stay in the loop:
 If you prefer not to use the AI prompt:
 
 1. Clone the repository:
+
    ```bash
    git clone --depth 1 https://github.com/sudokar/openspec-plus.git /tmp/openspec-plus
    ```
 
 2. Copy the skills to your agent's directory and the VERSION file to `openspec/.plus/` (example for OpenCode):
+
    ```bash
    cp -r /tmp/openspec-plus/skills/openspec-plus-* .opencode/skills/
    mkdir -p openspec/.plus && cp /tmp/openspec-plus/VERSION openspec/.plus/VERSION
    ```
 
 3. Merge the config rules into your `openspec/config.yaml`:
+
    ```bash
    cat /tmp/openspec-plus/openspec/config.yaml
    # Manually add the context and rules entries to your existing config.yaml

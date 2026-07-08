@@ -5,6 +5,18 @@ All notable changes to OpenSpec Plus will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-07-08
+
+### Fixed
+- Skill-prompt consistency: aligned `openspec-plus-apply` task passing contract with implementer prompt; removed stale `TDD-Discipline` category from spec-compliance reviewer return; fixed `openspec-plus-tdd` frontmatter description to match body guidance
+
+### Changed
+- `openspec-plus-tdd`: added mechanical constraints for one-test-per-edit and failing-test-only code paths; clarified Gherkin scenarios as guiding requirements rather than canonical source
+- `openspec-plus-apply`: enhanced cross-task refactoring guidance with enumerated clean code principles, refactoring patterns, and code smells; simplified implementer prompt
+- `openspec-plus-tasks`: refined core principles and workflow for vertical slicing and task discipline
+
+---
+
 ## [1.3.0] - 2026-07-06
 
 ### Changed

@@ -47,7 +47,7 @@ This skill takes over Step 6 only.
 - "Implementer skipped REFACTOR because nothing to refactor" — refactor assessment is mandatory; skipping the assessment is the violation, not the skipping of action
 - "AGENTS.md has many rules, implementer applied the ones that felt relevant" — cherry-picking the project's documented rules. Follow them strictly, end-to-end.
 - "Implementer did test 1 RED-GREEN-REFACTOR correctly, then batched the rest" — the per-test state machine applies to EVERY test, not just the first
-- "Implementer only wrote acceptance tests (one per Gherkin scenario), skipped all unit/edge tests" — acceptance coverage is mandatory but granular tests are encouraged for non-trivial branches, edges, error paths
+- "Implementer only wrote acceptance tests (one per Gherkin scenario), skipped all unit/edge tests" — Gherkin scenarios are guiding requirements, not the only test source. Unit, edge, error tests are mandatory for adequate coverage
 
 None justify re-reading artifacts, reading affected code into main context, editing spec/design, ignored failures, skipped reviewers, batched fixes, per-slice check-ins, fix-attempt #4, full-suite tests, commits, archive auto-trigger, verify-change handoff, batched scenario tests, skipped REFACTOR assessment, or cherry-picked project rules.
 
@@ -120,7 +120,7 @@ Artifacts (`proposal.md`, `spec.md`, `design.md`, `tasks.md`) are already in mai
 
 ### Strict TDD Through openspec-plus-tdd
 
-**Iron Law: NO PRODUCTION CODE WITHOUT A FAILING TEST.** One test at a time — full cycle (RED → VERIFY-RED → GREEN → VERIFY-GREEN → REFACTOR) before starting next. Applies to all tests: acceptance (mandatory per Gherkin scenario) and granular (encouraged). REFACTOR assessment mandatory per test — skipping assessment is the violation, not skipping action.
+**Iron Law: NO PRODUCTION CODE WITHOUT A FAILING TEST.** One test at a time — full cycle (RED → VERIFY → GREEN → VERIFY → REFACTOR) before starting next. Gherkin scenarios are guiding requirements; unit, edge, error tests are mandatory for full coverage, not optional. REFACTOR assessment mandatory per test — skipping assessment is the violation, not skipping action.
 
 ### Implementation Principles For Both Modes
 
@@ -265,11 +265,11 @@ For each slice (or parallel group):
 Dispatch implementer subagent using `./implementer-prompt.md`. Fill placeholders:
 
 * `{SLICE_NUMBER}`, `{SLICE_NAME}`
-* `{TASKS_TEXT}` — full text of all `N.M` tasks
-* `{SPEC_PATHS}` — **paths only** to slice-relevant spec file(s) (requirements + Gherkin). Implementer reads them.
-* `{DESIGN_PATH}` — **path only** to `design.md` (from `contextFiles` in vanilla step 2-4 output). Implementer reads it end-to-end.
-* `{AFFECTED_FILES}` — **paths only** (e.g., `src/auth/login.ts`, `tests/auth/login.test.ts`). Implementer reads them.
-* `{PROJECT_STANDARDS_PATHS}` — **paths only** to `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, and any docs they reference (e.g., `docs/coding-standards.md`, `docs/testing.md`, `CONTRIBUTING.md`, `docs/patterns/*`). Implementer reads them in Step 0 (Pre-RED).
+* `{TASKS_TEXT}` — full text of all `N.M` tasks for this slice
+* `{SPEC_PATHS}` — paths to slice-relevant spec file(s). Implementer reads them.
+* `{DESIGN_PATH}` — path to `design.md`. Implementer reads end-to-end.
+* `{AFFECTED_FILES}` — paths only. Implementer reads them.
+* `{PROJECT_STANDARDS_PATHS}` — paths to `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, and referenced docs. Implementer reads them.
 * `{LINT_CMD}`, `{FORMAT_CMD}`, `{TEST_CMD}`, `{OTHER_CHECKS}` — discovered at Phase 0
 * `{WORKING_DIR}`
 
@@ -304,7 +304,7 @@ NEVER read artifact or changed files in main context — pass paths only; review
 
 **OpenSpec-contract scope only** — does NOT verify project-rule compliance, naming style, comments, or lint/format. Those belong to code-quality reviewer (2.A.4).
 
-Returns ✅ Compliant OR ❌ Issues: `Task-Incomplete`, `Missing-Requirement`, `Missing-Scenario`, `Out-of-Scope`, `Design-Violation`, `TDD-Discipline`. ❌ → implementer fixes → run per-slice gate (2.A.5) on affected files → re-dispatch reviewer. Cap 3 cycles → STOP, pause and exit.
+Returns ✅ Compliant OR ❌ Issues: `Task-Incomplete`, `Missing-Requirement`, `Missing-Scenario`, `Out-of-Scope`, `Design-Violation`. ❌ → implementer fixes → run per-slice gate (2.A.5) on affected files → re-dispatch reviewer. Cap 3 cycles → STOP, pause and exit.
 
 #### 2.A.4 Code-Quality Review
 
@@ -368,11 +368,18 @@ Use `skill` tool to load `openspec-plus-tdd` once at Phase 2 start. If already l
 
 #### 2.B.2 Per-Slice TDD Cycle (ONE TEST AT A TIME)
 
-Follow `openspec-plus-tdd` Per-Test State Machine: pick ONE test (acceptance from Gherkin = mandatory, or granular = encouraged), complete full cycle (RED → VERIFY-RED → GREEN → VERIFY-GREEN → REFACTOR assessment → NEXT) before starting next. NEVER batch. Record per-test refactor outcome. Done when every Gherkin scenario has a passing test AND all granular tests pass. Apply four implementation principles + code-as-documentation throughout.
+Follow `openspec-plus-tdd` per-test loop: pick ONE test, complete full cycle (RED → VERIFY → GREEN → VERIFY → REFACTOR → NEXT) before starting next. NEVER batch. Record per-test refactor outcome. Gherkin scenarios are guiding requirements — write whatever tests fully satisfy them (acceptance, unit, edge, error). Done when every requirement satisfied AND all code paths tested. Apply four implementation principles + code-as-documentation throughout.
 
 #### 2.B.2.1 Cross-Task Refactor (MANDATORY)
 
-AFTER all tests pass, BEFORE self-reviews. Scan ALL code across ALL tasks in this slice: duplicate logic → extract shared utility; naming drift → unify; shared abstractions emerged → consolidate; dead code from earlier tasks superseded → remove. Run tests after every refactor. Record outcome (or "nothing found — reason").
+AFTER all tests pass, BEFORE self-reviews. Scan ALL code across ALL tasks in this slice:
+
+a. Enumerate applicable clean code principles
+b. Enumerate applicable refactoring patterns
+c. Enumerate applicable code smells
+d. Check against project conventions from Phase 0
+
+Assess each enumerated item across task boundaries. No cherry-picking — list then judge. Run tests after every refactor. Record outcome per item (or "nothing found — reason per item").
 
 #### 2.B.3 Inline Self-Reviews
 
@@ -380,7 +387,7 @@ Run three checklists in order (mirroring subagent reviewers). ALWAYS re-read `pr
 
 * **Spec-compliance self-check** — re-read proposal, slice-relevant spec file(s), and design end-to-end. Verify: every spec requirement implemented; every Gherkin scenario has a passing test; no work beyond proposal scope; design decisions honored; file structure matches design; naming consistent with artifact terminology.
 * **TDD-Discipline self-check** — verify each test completed the full per-test cycle individually (no batching); per-test refactor outcomes recorded with reasoning; all Gherkin scenarios covered. Violation → redo the slice with strict per-test discipline.
-* **Code-quality self-check** — re-read design for architecture, file structure, naming, and patterns. Verify against every convention enumerated in 2.B.0 — no selective skipping. Check: cross-task refactoring done (no duplicate logic, naming drift, missed shared abstractions, or dead code across tasks); surgical changes (every line traces to slice tasks); no speculative abstractions; **code is self-documenting (comments only for genuinely non-obvious logic / external-constraint workaround / counter-intuitive tradeoff; refactor attempted first)**; no commented-out code or TODO/FIXME markers; single responsibility; naming clear; decomposition matches design; per-test and cross-task refactor outcomes recorded.
+* **Code-quality self-check** — re-read design for architecture, file structure, naming, and patterns. Verify against every convention enumerated in 2.B.0 — no selective skipping. Check: cross-task refactoring done (all items from 2.B.2.1 enumerated and assessed — no cherry-picking); surgical changes (every line traces to slice tasks); no speculative abstractions; **code is self-documenting (comments only for genuinely non-obvious logic / external-constraint workaround / counter-intuitive tradeoff; refactor attempted first)**; no commented-out code or TODO/FIXME markers; single responsibility; naming clear; decomposition matches design; per-test and cross-task refactor outcomes recorded.
 
 Issues found → fix inline → run per-slice gate (2.B.4) on affected files → re-check. Cap 3 cycles per checklist → STOP, pause and exit.
 
