@@ -127,9 +127,13 @@ Use the **question tool**, ONE question at a time. Cover these lenses until each
 4. **Non-Goals** — what is explicitly NOT in scope; scope creep to prevent
 5. **Impact** — affected systems, files, teams, or workflows
 
-NEVER batch questions. NEVER assume answers. Mark a recommended option "(Recommended)" when defaults exist.
+NEVER batch questions. NEVER assume answers. Always include your recommended answer with rationale on every question — never a bare question without a recommendation.
 
-Once all five lenses answered, summarize for the user before writing: problem (one sentence), outcome (one sentence), in-scope capabilities, non-goals, impact areas.
+If the user's answer introduces a new decision point or leaves something partially unresolved, follow that branch with a targeted follow-up before advancing to the next lens. A lens is fully resolved only when no dependent decision within it remains open.
+
+If a fact can be determined from existing artifacts, project files, or the environment, look it up — do not ask the user for discoverable information.
+
+Once all five lenses answered, summarize for the user: problem (one sentence), outcome (one sentence), in-scope capabilities, non-goals, impact areas. Explicitly ask the user to confirm shared understanding before proceeding to Phase 2. Do NOT advance on silence or implied agreement.
 
 **Phase 1 Complete Checks:**
 - **Mid-discovery scope check:** re-evaluate — did scope grow beyond a single cohesive change during Q&A? If so, decompose before writing.

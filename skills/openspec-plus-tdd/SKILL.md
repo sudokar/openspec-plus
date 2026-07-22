@@ -1,7 +1,7 @@
 ---
 name: openspec-plus-tdd
 description: "MANDATORY skill that activates whenever code is written to implement an OpenSpec change task. Triggers: openspec-plus-apply is active, /opsx-apply is running, the user is implementing tasks from an OpenSpec change, an implementer subagent dispatched by openspec-plus-apply is starting work, or the user invokes phrases like 'TDD for the change', 'implementing change tasks', or 'writing tests for spec scenarios'. Load before any production code is written for an OpenSpec change. Enforces strict RED-GREEN-REFACTOR per test (any test — acceptance, unit, edge case, helper). Iron Law: NO PRODUCTION CODE WITHOUT A FAILING TEST. Gherkin scenarios in spec.md are the canonical source for acceptance tests (every scenario MUST become at least one test); additional unit, edge-case, and helper tests are encouraged and follow the same per-test cycle."
-version: 1.0.1
+version: 1.0.2
 priority: high
 disable-user-invocation: true
 ---
@@ -154,7 +154,7 @@ Test 3 (unit — edge case for `mapAuthError(null)`):
 [repeat for each test...]
 ```
 
-Tests 1-2: Gherkin scenarios (mandatory acceptance). Test 3: implementer-initiated edge case (encouraged granular). All follow the same per-test cycle.
+Tests 1-2: Gherkin scenarios (mandatory acceptance). Test 3: implementer-initiated edge case (granular). All follow the same per-test cycle.
 
 If you find yourself thinking *"I know all 5 cases, let me write them all at once"* — STOP. That is the violation. Delete what you just wrote. Restart from test 1.
 
@@ -183,7 +183,7 @@ These files are the contract — follow every documented rule strictly, end-to-e
 
 The test you write at this phase is one of two kinds:
 
-**1. Acceptance test — translated from a Gherkin scenario (mandatory coverage).**
+**1. Acceptance test — translated from a Gherkin scenario.**
 
 A Gherkin scenario in `spec.md`:
 
@@ -209,7 +209,7 @@ test('logs in with valid credentials', async () => {
 });
 ```
 
-**2. Granular test — implementer-initiated for a unit, edge case, helper, or error path (encouraged when valuable).**
+**2. Granular test — implementer-initiated for a unit, edge case, helper, or error path**
 
 Example: while implementing the login above, the implementer factors out a `mapAuthError` helper. They add a unit test for it:
 

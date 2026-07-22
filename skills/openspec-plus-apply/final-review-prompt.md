@@ -10,6 +10,8 @@ Dispatch the whole-change reviewer subagent at Phase 3 (after all slices `[x]`, 
 
 > type-general-purpose dispatch: Claude Code `Agent(general-purpose)` · Devin/Windsurf `run_subagent(subagent_general)` · OpenCode `@general` · Codex `spawn_agent` (`multi_agent=true`) · Antigravity `invoke_subagent(self)` · Pi `subagent` · unlisted → self-assess; no dispatch tool → main agent chooses inline.
 
+> **MAIN AGENT:** Copy the `prompt:` block below verbatim — substitute ONLY `{PLACEHOLDER}` tokens. Do NOT summarize, shorten, or drop any line. The urge to "tighten" this is the failure mode.
+
 ```
 Dispatch subagent of type general-purpose (use your subagent/task tool):
   description: "Final whole-change review for {CHANGE_NAME}"
@@ -45,9 +47,21 @@ Dispatch subagent of type general-purpose (use your subagent/task tool):
 
     ## What To Check
 
-    ### Cross-Slice Integration & Refactoring
+    Review discipline: work through each check section below one at a
+    time. For EACH section, you MUST:
 
-    Check across ALL slices combined:
+    1. **Write out** every item listed in that section as a numbered or
+       bulleted list BEFORE assessing any of them.
+    2. For each item, **write out** PASS or FAIL with a one-line reason.
+    3. Only after all items in the section are assessed, move to the next.
+
+    Do NOT batch, summarize, or assess silently — the per-section
+    enumeration and per-item verdict MUST appear in your written output.
+    Every item must be visited.
+
+    ### 1. Cross-Slice Integration
+
+    Check across ALL slices combined (both production and test code):
 
     * Shared interfaces consistent (signatures, types, error
       contracts match between producer/consumer slices)
@@ -59,7 +73,18 @@ Dispatch subagent of type general-purpose (use your subagent/task tool):
     * Superseded code — earlier slice code made redundant by
       later slice but not removed. Flag it.
 
-    ### Implementation Principles At Change Scope
+    ### 2. Cross-Slice Refactoring
+
+    Write out ALL that apply across all slices (do not skip any category):
+
+    a. Applicable clean code principles — list them, then for each: PASS or FAIL
+    b. Applicable refactoring patterns — list them, then for each: PASS or FAIL
+    c. Applicable code smells — list them, then for each: PASS or FAIL
+    d. Applicable project conventions and standards — list them, then for each: PASS or FAIL
+
+    No cherry-picking — every enumerated item gets a written verdict.
+
+    ### 3. Implementation Principles At Change Scope
 
     Apply at WHOLE change scope — catch issues invisible to
     per-slice reviews:
@@ -71,7 +96,7 @@ Dispatch subagent of type general-purpose (use your subagent/task tool):
     3. **Think First** — cross-slice integration choices are
        explicit and intentional, not silently assumed.
 
-    ### Implementation-Reveals-Artifact-Gap
+    ### 4. Implementation-Reveals-Artifact-Gap
 
     Surface gaps visible only in implementation — missing scenarios,
     unspecified interfaces, emergent components, task boundary

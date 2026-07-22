@@ -19,7 +19,7 @@
 <p align="center">
   <a href="https://github.com/sudokar/openspec-plus/stargazers"><img src="https://img.shields.io/github/stars/sudokar/openspec-plus?style=social" alt="GitHub Stars" /></a>
   &nbsp;
-  <img src="https://img.shields.io/badge/version-1.3.0-blue" alt="Version" />
+  <img src="https://img.shields.io/badge/version-1.4.0-blue" alt="Version" />
   &nbsp;
   <img src="https://img.shields.io/github/license/sudokar/openspec-plus" alt="License" />
 </p>
@@ -201,16 +201,6 @@ Contributions are welcome! Here are some ways to get involved:
 - **Share feedback** — tried it on a real project? [Start a discussion](https://github.com/sudokar/openspec-plus/discussions) and tell us what worked and what didn't
 
 Not sure where to start? Browse [open issues](https://github.com/sudokar/openspec-plus/issues) or jump into [discussions](https://github.com/sudokar/openspec-plus/discussions).
-
----
-
-## 💛 Support
-
-If OpenSpec Plus is saving you time and improving your workflow, consider supporting its development:
-
-<a href="https://github.com/sponsors/sudokar"><img src="https://img.shields.io/badge/Sponsor-♥-ea4aaa?logo=github" alt="GitHub Sponsors" /></a>
-<br>
-<a href="https://buymeacoffee.com/sudokar"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="28" /></a>
 
 ---
 

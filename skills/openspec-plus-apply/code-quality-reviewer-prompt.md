@@ -12,6 +12,8 @@ Dispatch a code-quality reviewer subagent for an OpenSpec change slice.
 
 > type-general-purpose dispatch: Claude Code `Agent(general-purpose)` · Devin/Windsurf `run_subagent(subagent_general)` · OpenCode `@general` · Codex `spawn_agent` (`multi_agent=true`) · Antigravity `invoke_subagent(self)` · Pi `subagent` · unlisted → self-assess; no dispatch tool → main agent chooses inline.
 
+> **MAIN AGENT:** Copy the `prompt:` block below verbatim — substitute ONLY `{PLACEHOLDER}` tokens. Do NOT summarize, shorten, or drop any line. The urge to "tighten" this is the failure mode.
+
 ```
 Dispatch subagent of type general-purpose (use your subagent/task tool):
   description: "Review code quality for slice {SLICE_NUMBER}"
@@ -31,16 +33,19 @@ Dispatch subagent of type general-purpose (use your subagent/task tool):
     ## Artifact Files (paths only — read them yourself)
 
     * Design: {DESIGN_PATH}
-    * Spec(s) for this slice: {SPEC_PATHS}
 
     * **Design** — read fully, end to end; its structure is dynamic
       (template-driven). Every section that touches this slice's
       architecture, file structure, component boundaries, naming,
       or patterns MUST be used for verification — do NOT skip or
       deprioritize any detail.
-    * **Spec(s)** — only the spec file(s) relevant to this slice
-      are passed. Use requirements and Gherkin scenarios as the
-      scope boundary for surgical/simplicity checks.
+
+    ## Spec Requirements & Gherkin Scenarios (This Slice Only)
+
+    {SPECS_TEXT}
+
+    Use these as the scope boundary for surgical/simplicity checks —
+    nothing beyond what requirements and scenarios asked for.
 
     ## Diff
 
@@ -63,51 +68,66 @@ Dispatch subagent of type general-purpose (use your subagent/task tool):
 
     ## What To Check
 
-    Standard concerns:
+    Review discipline: work through each concern section below one at a
+    time. For EACH section, you MUST:
 
-    * **File responsibility** — each file one clear responsibility,
-      well-defined interface
-    * **Decomposition** — each unit understandable and testable
-      independently
-    * **File growth** — did this slice create new files already large,
-      or significantly grow existing files? Don't flag pre-existing
-      sizes — focus on what THIS slice contributed
-    * **Naming** — match what things do, not how; consistent with
-      project's naming conventions
-    * **Error handling** — matches codebase's existing patterns
-    * **Test quality** — tests exercise real behavior not mock
-      behavior; comprehensive for slice's scenarios
+    1. **Write out** every item listed in that section as a numbered or
+       bulleted list BEFORE assessing any of them.
+    2. For each item, **write out** whether it is relevant to this slice,
+       then **write out** PASS or FAIL with a one-line reason.
+    3. Only after all items in the section are assessed, move to the next.
 
-    Cross-task refactoring concerns:
+    Do NOT batch, summarize, or assess silently — the per-section
+    enumeration and per-item verdict MUST appear in your written output.
+    Every item must be visited. Apply to both production and test code.
 
-    * **Duplicate logic** — same or near-same code across tasks
-      MUST be extracted into shared utility.
-    * **Naming drift** — same concept named differently across
-      tasks MUST be unified.
-    * **Missed shared abstractions** — repeated patterns across
-      tasks. Flag them.
-    * **Dead code** — earlier-task code superseded but not
-      removed. Flag it.
+    1. **Standard concerns:**
 
-    Implementation principles concerns:
+       * **File responsibility** — each file one clear responsibility,
+         well-defined interface
+       * **Decomposition** — each unit understandable and testable
+         independently
+       * **File growth** — did this slice create new files already large,
+         or significantly grow existing files? Don't flag pre-existing
+         sizes — focus on what THIS slice contributed
+       * **Naming** — match what things do, not how; consistent with
+         project's naming conventions
+       * **Error handling** — matches codebase's existing patterns
+       * **Test quality** — tests exercise real behavior not mock
+         behavior; comprehensive for slice's scenarios; same comment
+         convention as production (no Given/When/Then or Arrange/Act/
+         Assert narration, no comment restating the test name)
 
-    * **Surgical Changes** — every changed line traces to a slice task? Adjacent code refactored without being asked?
-    * **Simplicity First** — abstractions for single-use code? Configurability slice didn't request? Would a senior engineer call this overcomplicated?
-    * **No Speculative Features** — anything beyond what slice tasks and Gherkin scenarios required?
+    2. **Cross-task refactoring concerns:**
 
-    Code-style concerns:
+       Write out ALL that apply to this slice (do not skip any category):
 
-    * **Comments** — comments on non-complex logic are noise; flag them. If a comment exists, ask: could a better name/structure remove it? If yes, flag as Important (refactor-first rule).
-    * **Testability** — hard to test = hard to use, usually a sign of coupling.
-    * **Readability** — does each function fit one mental load?
-    * **Maintainability** — would a new contributor understand the slice's code shape in a few minutes?
-    * **No commented-out code, no TODO, no FIXME, no "explained later" markers.**
+       a. Applicable clean code principles — list them, then for each: PASS or FAIL
+       b. Applicable refactoring patterns — list them, then for each: PASS or FAIL
+       c. Applicable code smells — list them, then for each: PASS or FAIL
+       d. Applicable project conventions and standards — list them, then for each: PASS or FAIL
 
-    Project standards compliance (MANDATORY):
+       No cherry-picking — every enumerated item gets a review and written verdict.
 
-    Read every rule in the project standards docs. Verify the implementation honors each applicable rule — naming, structure, framework idioms, testing conventions, type annotations, file placement. Cherry-picking is itself a violation. Cite source doc for each violation (e.g., "AGENTS.md §Naming: `usrCtrl` should be `userController`").
+    3. **Implementation principles concerns:**
 
-    Severity: **Important** for most violations; **Critical** only when the rule breaks the build; **Minor** for "should"-level stylistic rules.
+       * **Surgical Changes** — every changed line traces to a slice task? Adjacent code refactored without being asked?
+       * **Simplicity First** — abstractions for single-use code? Configurability slice didn't request? Would a senior engineer call this overcomplicated?
+       * **No Speculative Features** — anything beyond what slice tasks and Gherkin scenarios required?
+
+    4. **Code-style concerns:**
+
+       * **Comments** — comments on non-complex logic are noise; flag them. If a comment exists, ask: could a better name/structure remove it? If yes, flag as Important (refactor-first rule).
+       * **Testability** — hard to test = hard to use, usually a sign of coupling.
+       * **Readability** — does each function fit one mental load?
+       * **Maintainability** — would a new contributor understand the slice's code shape in a few minutes?
+       * **No commented-out code, no TODO, no FIXME, no "explained later" markers.**
+
+    5. **Project standards compliance (MANDATORY):**
+
+       Read every rule in the project standards docs. Verify the implementation honors each applicable rule — naming, structure, framework idioms, testing conventions, type annotations, file placement. Cherry-picking is itself a violation. Cite source doc for each violation (e.g., "AGENTS.md §Naming: `usrCtrl` should be `userController`").
+
+       Severity: **Important** for most violations; **Critical** only when the rule breaks the build; **Minor** for "should"-level stylistic rules.
 
     ## Calibration
 
