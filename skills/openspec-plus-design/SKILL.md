@@ -1,7 +1,7 @@
 ---
 name: openspec-plus-design
 description: "MANDATORY skill that activates whenever the OpenSpec design phase begins. Triggers: /opsx-new, /opsx-ff, or /opsx-continue runs; openspec-new-change, openspec-ff-change, openspec-continue-change, or openspec-explore is active; `openspec instructions design` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec design document."
-version: 1.1.1
+version: 1.3.0
 priority: high
 disable-user-invocation: true
 ---
@@ -146,7 +146,7 @@ Proposal answered "why" + capabilities. Spec (if present) answered "what". Proje
 
 If no spec exists and you find yourself defining detailed requirements, STOP — that's spec-phase work.
 
-Identify: architectural decisions that must be made and areas where multiple solutions exist. Missing important info? Use question tool — ONE question at a time, never batch, wait for response.
+Identify: architectural decisions that must be made and areas where multiple solutions exist. If a fact can be determined from code, project files, or existing artifacts, look it up — do not ask the user for discoverable information. For decisions that genuinely require user input, use question tool — ONE question at a time, never batch, always with your recommended answer and rationale. If the user's answer introduces a dependent decision or leaves a branch unresolved, follow it before advancing. Do not generate approaches until all pre-approach decisions are resolved.
 
 Generate TWO OR THREE viable design approaches (two when only two meaningful directions exist; three when three materially different solutions exist; never invent a weak approach). Each approach MUST satisfy proposal capabilities and spec (if present). For each provide: Approach Name, Core Idea, Advantages, Disadvantages, Complexity Level, Key Assumptions. Approaches must be meaningfully different — no cosmetic variations.
 
@@ -268,7 +268,7 @@ Mark Phase 3 complete. Update task status.
 
 Only after approaches explored, direction selected, and all sections reviewed/accepted.
 
-Final design must: reflect selected approach, incorporate approved refinements, preserve tradeoffs, align with proposal/spec, stay at architecture level. Use `template` and `outputPath` from Phase 0. Use template structure EXACTLY. Apply `instruction` and `rules` as constraints — do NOT copy them into the file.
+Final design must: reflect only the selected approach (skip the discarded approaches), incorporate approved refinements, preserve tradeoffs, align with proposal/spec, stay at architecture level. Use `template` and `outputPath` from Phase 0. Use template structure EXACTLY. Apply `instruction` and `rules` as constraints — do NOT copy them into the file.
 
 **Structure is content — preserve the form.** Whatever representation information took during Phase 1-3 — table, diagram, matrix, comparison, enumeration, flow, or any other non-prose structure — that form must carry through to the artifact unchanged. Reducing any structured representation to prose loses the structure and therefore the meaning, regardless of word count.
 
@@ -286,7 +286,20 @@ Write to `outputPath` from Phase 0.
 
 ---
 
-## 4.2 Artifact Compliance Review (MANDATORY — single-shot)
+## 4.2 Session Context Fidelity Check (MANDATORY)
+
+Inline self-check before dispatching the compliance reviewer.
+
+Re-read the written design.md in full. Then scan the entire session — Phase 1-3 discussions, user inputs, and any pre-phase conversations. For each design decision, tradeoff, rationale, constraint, or integration detail surfaced **for the selected approach**: verify it appears in the written design.md with its original specificity intact. Discarded approaches from Phase 1-2 are intentionally absent — do NOT flag their omission.
+
+**Pass:** all context captured → proceed to 4.3.  
+**Fail:** list each missing item with its session source → fix design.md inline → re-verify all fixes before proceeding to 4.3.
+
+Do NOT skip. Do NOT proceed to 4.3 with any material context missing.
+
+---
+
+## 4.3 Artifact Compliance Review (MANDATORY — single-shot)
 
 Dispatch subagent of type `general-purpose` (use your subagent/task tool) with reviewer prompt below. Subagent loads written design.md, proposal, spec (if present) into its own context, returns structured findings list, exits.
 > type-general-purpose dispatch: Claude Code `Agent(general-purpose)` · Devin/Windsurf `run_subagent(subagent_general)` · OpenCode `@general` · Codex `spawn_agent` (`multi_agent=true`) · Antigravity `invoke_subagent(self)` · Pi `subagent` · unlisted → self-assess; no dispatch tool → execute inline as self-check.
@@ -344,14 +357,14 @@ Recommendations (advisory, do not block):
 
 After receiving reviewer's response:
 
-* Status Approved → proceed to 4.3
+* Status Approved → proceed to 4.4
 * Status Issues Found → fix each Issue inline in root context (NEVER re-dispatch)
 
 **Same density rule applies.** If the fixed design is significantly shorter than the sum of Phase 1-3 discussions, re-expand before proceeding.
 
 ---
 
-## 4.3 Mark Phase 4 Complete
+## 4.4 Mark Phase 4 Complete
 
 Surface design for user review. Mark Phase 4 complete. Present final workflow completion.
 

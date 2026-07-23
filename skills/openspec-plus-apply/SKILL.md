@@ -37,6 +37,8 @@ This skill takes over Step 6 only.
 - "Slice is small, skip the spec-compliance reviewer" — never
 - "Implementer's report says DONE, good enough" — verify with reviewer subagents
 - "Both reviewers found issues, fix simultaneously" — spec-compliance first, re-review, then code-quality
+- "Reviewing is generic, I'll write the review prompt myself" — NO. Every reviewer dispatch reads its `*-prompt.md` and sends the body verbatim; improvising it is the #1 failure mode
+- "This prompt is long, I'll tighten it / drop the obvious parts when passing it on" — NO. Copy the template's `prompt:` block verbatim, substitute only `{PLACEHOLDER}`s. Every bullet is load-bearing; simplifying silently strips instructions from the subagent
 - "Should I continue to the next slice?" — never ask. Continuous unless BLOCKED
 - "Three fixes failed, try a fourth" — STOP. Artifacts wrong. Pause and exit
 - "Run all tests instead of just affected" — wastes time; per-slice gate is scoped
@@ -258,22 +260,26 @@ Output: `[slice_1, slice_2, ..., (parallel_group_X), ..., slice_N]`. Add per-sli
 
 For each slice (or parallel group):
 
+### Subagent Dispatch Contract (MANDATORY — 2.A.1, 2.A.3, 2.A.4, 3.1)
+
+Before EVERY dispatch (implementer AND reviewers): **READ the referenced `*-prompt.md`** (resolve `./` next to this SKILL.md, not the CWD). The subagent prompt is that file's fenced `prompt:` block — **copy it verbatim**, replacing ONLY `{PLACEHOLDER}` tokens. You are transcribing a payload, not re-authoring one: do NOT summarize, condense, shorten, paraphrase, reorder, or drop any line, bullet, or section — the length is deliberate and load-bearing. NEVER reconstruct a prompt from memory — reviewer prompts are NOT generic. The urge to "tighten" or "drop the obvious parts" is the failure mode. The placeholder lists below say WHAT to substitute, not what to send.
+
 ### 2.A Subagent Mode
 
 #### 2.A.1 Dispatch Implementer
 
-Dispatch implementer subagent using `./implementer-prompt.md`. Fill placeholders:
+Per the Dispatch Contract, **read `./implementer-prompt.md` NOW, send verbatim.** Fill placeholders:
 
 * `{SLICE_NUMBER}`, `{SLICE_NAME}`
 * `{TASKS_TEXT}` — full text of all `N.M` tasks
-* `{SPEC_PATHS}` — **paths only** to slice-relevant spec file(s) (requirements + Gherkin). Implementer reads them.
+* `{SPECS_TEXT}` — full text of slice-relevant scenarios from specs (requirements + Gherkin)
 * `{DESIGN_PATH}` — **path only** to `design.md` (from `contextFiles` in vanilla step 2-4 output). Implementer reads it end-to-end.
 * `{AFFECTED_FILES}` — **paths only** (e.g., `src/auth/login.ts`, `tests/auth/login.test.ts`). Implementer reads them.
 * `{PROJECT_STANDARDS_PATHS}` — **paths only** to `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, and any docs they reference (e.g., `docs/coding-standards.md`, `docs/testing.md`, `CONTRIBUTING.md`, `docs/patterns/*`). Implementer reads them in Step 0 (Pre-RED).
 * `{LINT_CMD}`, `{FORMAT_CMD}`, `{TEST_CMD}`, `{OTHER_CHECKS}` — discovered at Phase 0
 * `{WORKING_DIR}`
 
-NEVER make subagent read `tasks.md` — paste full slice text. NEVER inherit session history. For spec/design/affected files, pass paths only; implementer reads them.
+NEVER make subagent read `tasks.md` and `specs/**/*.md` — paste full slice text. NEVER inherit session history. For design/affected/standards files, pass paths only; implementer reads them.
 
 #### 2.A.2 Handle Implementer Status
 
@@ -290,14 +296,14 @@ Never silently retry without changing something.
 
 #### 2.A.3 Spec-Compliance Review
 
-Dispatch using `./spec-compliance-reviewer-prompt.md`. Fill placeholders:
+Per the Dispatch Contract, **read `./spec-compliance-reviewer-prompt.md` NOW, send verbatim.** Fill placeholders:
 
 * `{SLICE_NUMBER}`, `{SLICE_NAME}`
 * `{TASKS_TEXT}` — full text of all `N.M` tasks for this slice
 * `{IMPLEMENTER_REPORT}` — what the implementer reported after completing the slice
 * `{CHANGED_FILE_PATHS}` — **paths only** to files the implementer modified or created
 * `{PROPOSAL_PATH}` — **path only** to `proposal.md` (from `contextFiles` in vanilla step 2-4 output)
-* `{SPEC_PATHS}` — **paths only** to the spec file(s) relevant to this slice (only those containing requirements and Gherkin scenarios that map to this slice's tasks)
+* `{SPECS_TEXT}` — full text of slice-relevant scenarios from specs (only those containing requirements and Gherkin scenarios that map to this slice's tasks)
 * `{DESIGN_PATH}` — **path only** to `design.md` (from `contextFiles` in vanilla step 2-4 output)
 
 NEVER read artifact or changed files in main context — pass paths only; reviewer reads in isolated context.
@@ -308,13 +314,13 @@ Returns ✅ Compliant OR ❌ Issues: `Task-Incomplete`, `Missing-Requirement`, `
 
 #### 2.A.4 Code-Quality Review
 
-ONLY after spec-compliance ✅. Dispatch using `./code-quality-reviewer-prompt.md`. Fill placeholders:
+ONLY after spec-compliance ✅. Per the Dispatch Contract, **read `./code-quality-reviewer-prompt.md` NOW, send verbatim.** Fill placeholders:
 
 * `{SLICE_NUMBER}`, `{SLICE_NAME}`
 * `{TASKS_TEXT}` — full text of all `N.M` tasks for this slice
 * `{IMPLEMENTER_REPORT}` — what the implementer reported after completing the slice
 * `{DESIGN_PATH}` — **path only** to `design.md` (from `contextFiles` in vanilla step 2-4 output); reviewer reads fully for architecture, file structure, naming, patterns
-* `{SPEC_PATHS}` — **paths only** to the spec file(s) relevant to this slice (same set passed to spec-compliance reviewer)
+* `{SPECS_TEXT}` — full text of slice-relevant scenarios from specs (only those containing requirements and Gherkin scenarios that map to this slice's tasks)
 * `{CHANGED_FILE_PATHS}` — **paths only** to files the implementer modified or created; reviewer diffs via `git diff HEAD` (no git → reads files directly)
 * `{STANDARDS_DOC_PATHS}` — **paths only** to `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, and referenced docs
 
@@ -412,7 +418,7 @@ Each pause exits Phase 2, surfaces context, suggests plus-* update.
 
 After all slices `[x]`:
 
-Dispatch using `./final-review-prompt.md`. Pass: change name/schema, all artifact paths, all changed file paths. Main agent does NOT pre-read the diff. Reviewer diffs via `git diff HEAD` (no git → reads files directly). Verifies cross-slice integration, surfaces design issues (advisory), applies principles whole-change. Does NOT do spec/design alignment (that's `openspec-verify-change`).
+Per the Dispatch Contract, **read `./final-review-prompt.md` NOW, send verbatim.** Pass: change name/schema, all artifact paths, all changed file paths. Main agent does NOT pre-read the diff. Reviewer diffs via `git diff HEAD` (no git → reads files directly). Verifies cross-slice integration, surfaces design issues (advisory), applies principles whole-change. Does NOT do spec/design alignment (that's `openspec-verify-change`).
 
 Issues: small/local → fix inline; large/cross-slice → re-dispatch implementer. Cap 3 cycles → STOP, pause and exit.
 

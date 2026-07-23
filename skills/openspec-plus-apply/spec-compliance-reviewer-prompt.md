@@ -12,6 +12,8 @@ Dispatch a spec-compliance reviewer subagent for an OpenSpec change slice.
 
 > type-general-purpose dispatch: Claude Code `Agent(general-purpose)` · Devin/Windsurf `run_subagent(subagent_general)` · OpenCode `@general` · Codex `spawn_agent` (`multi_agent=true`) · Antigravity `invoke_subagent(self)` · Pi `subagent` · unlisted → self-assess; no dispatch tool → main agent chooses inline.
 
+> **MAIN AGENT:** Copy the `prompt:` block below verbatim — substitute ONLY `{PLACEHOLDER}` tokens. Do NOT summarize, shorten, or drop any line. The urge to "tighten" this is the failure mode.
+
 ```
 Dispatch subagent of type general-purpose (use your subagent/task tool):
   description: "Review spec compliance for slice {SLICE_NUMBER}"
@@ -31,7 +33,6 @@ Dispatch subagent of type general-purpose (use your subagent/task tool):
     ## Artifact Files (paths only — read them yourself)
 
     * Proposal: {PROPOSAL_PATH}
-    * Spec(s) for this slice: {SPEC_PATHS}
     * Design: {DESIGN_PATH}
 
     * **Proposal and design** — read fully, end to end; their
@@ -39,9 +40,13 @@ Dispatch subagent of type general-purpose (use your subagent/task tool):
       touches this slice's scope, intent, constraints, non-goals,
       or architectural decisions MUST be used for verification —
       do NOT skip or deprioritize any detail.
-    * **Spec(s)** — only the spec file(s) relevant to this slice
-      are passed. Verify all requirements (WHEN/THEN clauses) and
-      Gherkin scenarios (GIVEN/WHEN/THEN) in them.
+
+    ## Spec Requirements & Gherkin Scenarios (This Slice Only)
+
+    {SPECS_TEXT}
+
+    Each scenario is the canonical source for one acceptance test.
+    Verify GIVEN/WHEN/THEN faithfully — NEVER paraphrase.
 
     ## Changed Files (paths only — read them yourself)
 
@@ -121,18 +126,6 @@ Dispatch subagent of type general-purpose (use your subagent/task tool):
 
     * Design: "session storage in Redis". Code uses in-memory map.
 
-    ### TDD-Discipline (3-cycle cap)
-
-    The implementer MUST follow RED→GREEN→REFACTOR per test. Flag
-    as TDD-Discipline violation if:
-
-    * Per-test refactor outcomes are missing, vague, or incomplete
-    * Report evidence suggests tests were batched (multiple tests
-      written before production code)
-
-    TDD-Discipline violation → implementer redoes the slice with
-    strict per-test discipline.
-
     ### Out Of Scope For You
 
     Do NOT flag:
@@ -154,11 +147,29 @@ Dispatch subagent of type general-purpose (use your subagent/task tool):
 
     ## How To Verify
 
-    * Each task `N.K`: locate fulfilling code/tests. Missing/partial → Task-Incomplete (cite `N.K`).
-    * Each spec requirement: locate behavior. Missing → Missing-Requirement.
-    * Each Gherkin scenario: confirm GIVEN/WHEN/THEN map faithfully. Missing/paraphrased → Missing-Scenario.
-    * Each Non-Goal + diff hunks not traceable to any task `N.K` → Out-of-Scope.
-    * Each `design.md` decision: confirm honored (storage, symbols, file structure). Violated → Design-Violation.
+    Review discipline: for EACH category, enumerate every concrete item
+    from the artifacts before assessing any of them. Work through items
+    one by one, select the items that are relevant to the current slice's
+    requirements, note a per-item pass/fail as you go, then carry all
+    failures into the Issues output. Do NOT batch or summarize across
+    items — assess each one individually.
+
+    * **Task-Incomplete:** List every task `N.K` from `{TASKS_TEXT}` above.
+      For each: locate the fulfilling code/tests → ✓ fulfilled or
+      ✗ missing/partial. Every ✗ → Task-Incomplete issue (cite `N.K`).
+    * **Missing-Requirement:** List every WHEN/THEN requirement from the
+      spec(s) above. For each: locate the implementing behavior → ✓ present
+      or ✗ absent. Every ✗ → Missing-Requirement issue.
+    * **Missing-Scenario:** List every Gherkin scenario from the spec(s)
+      above. For each: locate the corresponding test and verify
+      GIVEN/WHEN/THEN faithfully → ✓ faithful or ✗ missing/paraphrased.
+      Every ✗ → Missing-Scenario issue.
+    * **Out-of-Scope:** List every proposal Non-Goal. For each: confirm no
+      code adds it → ✓ clean or ✗ violated. Also scan diff hunks not
+      traceable to any task `N.K` → ✗ → Out-of-Scope issue.
+    * **Design-Violation:** List every architectural decision from
+      `design.md`. For each: confirm the implementation honors it →
+      ✓ honored or ✗ contradicted. Every ✗ → Design-Violation issue.
 
     Do NOT verify project-rule compliance — that is the code-quality reviewer's job.
 
@@ -180,7 +191,7 @@ Dispatch subagent of type general-purpose (use your subagent/task tool):
 
     Categories (all 3-cycle cap):
       Task-Incomplete | Missing-Requirement | Missing-Scenario |
-      Out-of-Scope | Design-Violation | TDD-Discipline
+      Out-of-Scope | Design-Violation
 
     Mark each issue clearly with its category. The main agent's
     handling: implementer fixes → re-review (you will be
@@ -205,7 +216,7 @@ Dispatch subagent of type general-purpose (use your subagent/task tool):
 
 | Cycle | Action |
 |---|---|
-| 1-2 | Implementer fixes issues, reviewer re-dispatched. TDD-Discipline violation → implementer redoes the slice with strict per-test discipline. |
+| 1-2 | Implementer fixes issues, reviewer re-dispatched. |
 | 3 | STOP. Pause and exit. Suggest `plus-spec` / `plus-design` artifact update for spec/design issues, OR `plus-tasks` if a task description is unclear/wrong. |
 
 NEVER attempt cycle 4.

@@ -55,7 +55,7 @@ When invoked from `/opsx-ff` (or user requests fast-forward / "keep momentum" / 
 * Skip Phase 1 interactive ambiguity / edge-case Q&A. Extract requirements from proposal (and design, if present); resolve ambiguities by reasonable assumption.
 * Document assumptions inline in the spec so reviewers see what was decided.
 * Run Phase 1 Project Context, requirement extraction, Gherkin scenario writing, and Phase 2 alignment check NORMALLY.
-* Run Phase 3.3 reviewer subagent NORMALLY — single-shot review still applies. Subagent catches what fast-mode assumptions miss.
+* Run Phase 3.4 reviewer subagent NORMALLY — single-shot review still applies. Subagent catches what fast-mode assumptions miss.
 
 Pause only if reviewer surfaces material issues, or a requirement is critically ambiguous in a way that affects the whole spec.
 
@@ -126,6 +126,8 @@ Parse template sections (H2/H3/H4 headers + HTML comments). These are your **inf
 **Pre-existing answers:** If recent conversation already answered any analysis points (requirements, ambiguities, edge cases, stakeholder concerns, scenarios) — via prior exploration, a detailed initial request, or any other source — incorporate those into your analysis and SKIP the corresponding question. Ask ONE question at a time only for genuinely unresolved gaps. NEVER re-ask questions already answered.
 
 Run every step. Where ambiguities or gaps require user decision, use **question tool** — one question at a time, with options. NEVER write any file during this phase.
+
+Always include your recommended answer with rationale on every question — never a bare question without a recommendation. If the user's answer introduces a new ambiguity or dependent decision, follow that branch before advancing to the next step or gap. A gap or ambiguity is only resolved when no sub-decision within it remains open. If a fact can be determined from existing artifacts, project files, or the environment, look it up — do not ask the user for discoverable information.
 
 ## 1. Project Context
 
@@ -206,6 +208,8 @@ Once all answered, summarize resolved decisions:
 * List each ambiguity/gap and user's chosen answer
 * Confirm no open questions remain
 
+Explicitly ask the user to confirm shared understanding before proceeding to Phase 2. Do NOT advance on silence or implied agreement.
+
 **Template coverage check:** Verify every template section (from Phase 0) has collected substance to fill it. If any section lacks substance, ask targeted questions until covered.
 
 **Rules compliance check:** Review `rules` from Phase 0. If any rule constrains what can be specified (e.g., "all requirements must have Gherkin scenarios", "edge cases must be explicitly documented"), verify the requirements honor those constraints. If a rule is violated, surface the conflict to the user before proceeding.
@@ -270,7 +274,18 @@ AND the response status is 200
 BUT no audit logs are exposed
 ```
 
-## 3.3 Artifact Compliance Review (mandatory, single-shot)
+## 3.3 Session Context Fidelity Check (MANDATORY)
+
+Inline self-check before dispatching the compliance reviewer.
+
+Re-read the written spec.md in full. Then scan the entire session — Phase 1 analysis, user inputs, resolved ambiguities, gap decisions, scenario discussions, and any pre-phase conversations. For each requirement, constraint, clarification, edge case decision, or behavioral detail surfaced **for the agreed spec**: verify it appears in the written spec.md with its original specificity intact. Discarded alternatives from Phase 1 Q&A are intentionally absent — do NOT flag their omission.
+
+**Pass:** all agreed context captured → proceed to 3.4.  
+**Fail:** list each missing item with its session source → fix spec.md inline → re-verify all fixes before proceeding to 3.4.
+
+Do NOT skip. Do NOT proceed to 3.4 with any agreed requirement or decision missing.
+
+## 3.4 Artifact Compliance Review (mandatory, single-shot)
 
 Dispatch subagent of type `general-purpose` (use your subagent/task tool) with reviewer prompt below. Subagent loads spec, proposal, design (if present) into its own context, returns structured findings list, exits.
 > type-general-purpose dispatch: Claude Code `Agent(general-purpose)` · Devin/Windsurf `run_subagent(subagent_general)` · OpenCode `@general` · Codex `spawn_agent` (`multi_agent=true`) · Antigravity `invoke_subagent(self)` · Pi `subagent` · unlisted → self-assess; no dispatch tool → execute inline as self-check.

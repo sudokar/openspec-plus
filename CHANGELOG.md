@@ -5,6 +5,18 @@ All notable changes to OpenSpec Plus will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-07-23
+
+### Changed
+- `openspec-plus-apply`: enforces verbatim subagent prompt dispatch (Dispatch Contract), inlines spec content via `{SPECS_TEXT}`, adds explicit VERIFY-RED step to TDD loop, drops `TDD-Discipline` review category, and tightens per-item enumeration discipline in spec-compliance review
+- `openspec-plus-design`: adds mandatory Session Context Fidelity Check (Phase 4.2) before compliance review to catch missing decisions and rationale
+- `openspec-plus-spec`: adds mandatory Session Context Fidelity Check (Phase 3.3) before compliance review; questions now require a recommendation; explicit user confirmation before advancing phases
+- `openspec-plus-proposal`: questions now require a recommendation with rationale; explicit user confirmation before advancing phases; agents resolve discoverable facts from artifacts instead of asking
+- `openspec-plus-tasks`: slice/task discipline criteria reformulated around Slice, Task, WHAT-not-HOW, and Behavior-only principles
+- `openspec-plus-tdd`: minor wording cleanup; no behavioral change
+
+---
+
 ## [1.3.0] - 2026-07-06
 
 ### Changed
