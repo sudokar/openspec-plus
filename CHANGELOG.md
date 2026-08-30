@@ -5,6 +5,14 @@ All notable changes to OpenSpec Plus will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.1] - 2026-08-30
+
+### Fixed
+- `openspec-plus-apply`: removed unreliable Fast-Forward Mode detection from reviewer activation triggers — fuzzy keyword matching could accidentally skip mandatory Q&A in /opsx-new and /opsx-continue; /opsx-ff now falls back to vanilla OpenSpec behavior
+- `openspec-plus-apply`: reviewer subagent prompts (code-quality, final-review, spec-compliance) now explicitly mark the walkthrough section as working analysis only and instruct the subagent to output ONLY the Return Format as its final answer, preventing verbose intermediate analysis from leaking into the apply phase output
+
+---
+
 ## [1.4.0] - 2026-07-23
 
 ### Changed
