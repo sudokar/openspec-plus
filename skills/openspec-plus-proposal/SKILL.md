@@ -1,7 +1,7 @@
 ---
 name: openspec-plus-proposal
-description: "MANDATORY skill that activates whenever the OpenSpec proposal phase begins. Triggers: /opsx-new, /opsx-ff, or /opsx-continue runs; openspec-new-change, openspec-ff-change, openspec-continue-change, or openspec-explore is active; `openspec instructions proposal` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec proposal."
-version: 1.2.0
+description: "MANDATORY skill that activates whenever the OpenSpec proposal phase begins. Triggers: /opsx-new or /opsx-continue runs; openspec-new-change, openspec-continue-change, or openspec-explore is active; `openspec instructions proposal` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec proposal."
+version: 1.3.0
 priority: high
 disable-user-invocation: true
 ---
@@ -21,20 +21,6 @@ OpenSpec provides the format and template (resolved dynamically in Phase 0). Thi
 * User request — authoritative for intent
 * Existing proposals in `openspec/changes/` — for terminology and convention only
 * NEVER read source code — proposal is intent, not implementation grounding
-
----
-
-## Fast-Forward Mode (opsx-ff)
-
-When invoked from `/opsx-ff` context (or the user requests fast-forward / "keep momentum" / "skip questions"):
-
-* Run Phase -1 Auto-Update Check NORMALLY — this is NEVER skipped.
-* Skip Phase 1 interactive Q&A. Extract answers for the five lenses (Problem & Why, Goals, Scope & Capabilities, Non-Goals, Impact) from the user's description and any prior context.
-* Where context is silent on a lens, make a reasonable assumption based on apparent scope. Document assumptions inline in the proposal where they affect the artifact.
-* Run the decomposition check, format compliance, and Artifact Compliance Review NORMALLY — these are NOT skipped.
-* Only pause for the user if a lens is CRITICALLY ambiguous in a way that materially changes the proposal's scope.
-
-Detection: `/opsx-ff` in conversation OR explicit FF keywords ("fast-forward", "skip questions", "keep momentum", "just create everything", "all artifacts", "no questions"). Normal continuation words ("continue", "go", "proceed", "next", "yes", "ok") do NOT trigger FF — requires explicit intent.
 
 ---
 

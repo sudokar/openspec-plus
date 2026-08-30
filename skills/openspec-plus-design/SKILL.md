@@ -1,7 +1,7 @@
 ---
 name: openspec-plus-design
-description: "MANDATORY skill that activates whenever the OpenSpec design phase begins. Triggers: /opsx-new, /opsx-ff, or /opsx-continue runs; openspec-new-change, openspec-ff-change, openspec-continue-change, or openspec-explore is active; `openspec instructions design` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec design document."
-version: 1.3.0
+description: "MANDATORY skill that activates whenever the OpenSpec design phase begins. Triggers: /opsx-new or /opsx-continue runs; openspec-new-change, openspec-continue-change, or openspec-explore is active; `openspec instructions design` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec design document."
+version: 1.4.0
 priority: high
 disable-user-invocation: true
 ---
@@ -43,24 +43,6 @@ When this skill runs:
 * If spec exists, ALWAYS read it — design MUST align with it
 * If no spec yet, design works from proposal capabilities only — do NOT capture detailed requirements (that's spec phase, runs after design)
 * Design MUST align with proposal AND any existing spec
-
----
-
-## Fast-Forward Mode (opsx-ff)
-
-When invoked from `/opsx-ff` (or user requests fast-forward / "keep momentum" / "skip questions"):
-
-* Skip Phase 1 alternatives exploration. Pick a single reasonable approach grounded in proposal, any existing spec, code-pattern context.
-* Skip Phase 2 user selection. Proceed with chosen approach directly.
-* Skip Phase 3 section-by-section approval. Generate sections end-to-end.
-* Run Phase 1 Project Context NORMALLY.
-* Run Phase 4 self-review NORMALLY.
-
-Document key decisions and tradeoffs inline so they're visible without explicit user approval.
-
-Pause only if Phase 4 self-review surfaces drift, or proposal/spec is critically ambiguous.
-
-Detection: `/opsx-ff` in conversation OR explicit FF keywords ("fast-forward", "skip questions", "keep momentum", "just create everything", "all artifacts", "no questions"). Normal continuation words ("continue", "go", "proceed", "next", "yes", "ok") do NOT trigger FF — requires explicit intent.
 
 ---
 

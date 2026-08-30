@@ -1,7 +1,7 @@
 ---
 name: openspec-plus-tasks
-description: "MANDATORY skill that activates whenever the OpenSpec tasks phase begins. Triggers: /opsx-new, /opsx-ff, or /opsx-continue runs; openspec-new-change, openspec-ff-change, openspec-continue-change, or openspec-explore is active; `openspec instructions tasks` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec tasks.md file."
-version: 1.2.0
+description: "MANDATORY skill that activates whenever the OpenSpec tasks phase begins. Triggers: /opsx-new or /opsx-continue runs; openspec-new-change, openspec-continue-change, or openspec-explore is active; `openspec instructions tasks` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec tasks.md file."
+version: 1.3.0
 priority: high
 disable-user-invocation: true
 ---
@@ -44,21 +44,6 @@ Two anchors that shape every task group:
 * **NEVER read source code** — design phase already grounded patterns
 
 If the design is missing detail you need to slice the work, the design is incomplete. Surface the gap to the user — do not paper over with code reading.
-
----
-
-## Fast-Forward Mode (opsx-ff)
-
-When invoked from `/opsx-ff` (or user requests fast-forward / "keep momentum" / "skip questions"):
-
-* Skip clarifying questions about slice boundaries. Identify vertical slices and testable outcomes from spec and design directly.
-* Where slicing is ambiguous, make a reasonable choice and document the rationale in the task descriptions.
-* Run vertical-slice identification and dependency ordering NORMALLY.
-* Run Phase 2.2 reviewer subagent NORMALLY — single-shot review still applies. Subagent catches slicing or coverage issues that fast-mode assumptions miss.
-
-Pause only if reviewer surfaces material issues, or slicing is critically ambiguous in a way that affects multiple groups.
-
-Detection: `/opsx-ff` in conversation OR explicit FF keywords ("fast-forward", "skip questions", "keep momentum", "just create everything", "all artifacts", "no questions"). Normal continuation words ("continue", "go", "proceed", "next", "yes", "ok") do NOT trigger FF — requires explicit intent.
 
 ---
 
