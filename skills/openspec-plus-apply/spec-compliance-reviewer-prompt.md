@@ -152,7 +152,8 @@ Dispatch subagent of type general-purpose (use your subagent/task tool):
     one by one, select the items that are relevant to the current slice's
     requirements, note a per-item pass/fail as you go, then carry all
     failures into the Issues output. Do NOT batch or summarize across
-    items — assess each one individually.
+    items — assess each one individually. This walkthrough is working
+    analysis only; your final answer is ONLY the Return Format below.
 
     * **Task-Incomplete:** List every task `N.K` from `{TASKS_TEXT}` above.
       For each: locate the fulfilling code/tests → ✓ fulfilled or
@@ -179,6 +180,8 @@ Dispatch subagent of type general-purpose (use your subagent/task tool):
     or scope. Trivial naming preferences are NOT issues.
 
     ## Return Format
+
+    Send only this as your final answer. Leave the analysis above out.
 
     Status: ✅ Compliant  |  ❌ Issues Found
 

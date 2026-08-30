@@ -1,7 +1,7 @@
 ---
 name: openspec-plus-spec
-description: "MANDATORY skill that activates whenever the OpenSpec specification phase begins. Triggers: /opsx-new, /opsx-ff, or /opsx-continue runs; openspec-new-change, openspec-ff-change, openspec-continue-change, or openspec-explore is active; `openspec instructions spec` or `openspec instructions specs` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec specification."
-version: 1.1.1
+description: "MANDATORY skill that activates whenever the OpenSpec specification phase begins. Triggers: /opsx-new or /opsx-continue runs; openspec-new-change, openspec-continue-change, or openspec-explore is active; `openspec instructions spec` or `openspec instructions specs` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec specification."
+version: 1.2.0
 priority: high
 disable-user-invocation: true
 ---
@@ -45,21 +45,6 @@ When this skill runs:
 * ALWAYS read approved proposal — authoritative source of intent
 * If design exists, ALWAYS read it — constrains acceptable spec language and bounded behavior
 * Spec MUST align with proposal AND any existing design
-
----
-
-## Fast-Forward Mode (opsx-ff)
-
-When invoked from `/opsx-ff` (or user requests fast-forward / "keep momentum" / "skip questions"):
-
-* Skip Phase 1 interactive ambiguity / edge-case Q&A. Extract requirements from proposal (and design, if present); resolve ambiguities by reasonable assumption.
-* Document assumptions inline in the spec so reviewers see what was decided.
-* Run Phase 1 Project Context, requirement extraction, Gherkin scenario writing, and Phase 2 alignment check NORMALLY.
-* Run Phase 3.4 reviewer subagent NORMALLY — single-shot review still applies. Subagent catches what fast-mode assumptions miss.
-
-Pause only if reviewer surfaces material issues, or a requirement is critically ambiguous in a way that affects the whole spec.
-
-Detection: `/opsx-ff` in conversation OR explicit FF keywords ("fast-forward", "skip questions", "keep momentum", "just create everything", "all artifacts", "no questions"). Normal continuation words ("continue", "go", "proceed", "next", "yes", "ok") do NOT trigger FF — requires explicit intent.
 
 ---
 
