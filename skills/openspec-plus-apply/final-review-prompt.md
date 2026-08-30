@@ -57,7 +57,8 @@ Dispatch subagent of type general-purpose (use your subagent/task tool):
 
     Do NOT batch, summarize, or assess silently — the per-section
     enumeration and per-item verdict MUST appear in your written output.
-    Every item must be visited.
+    Every item must be visited. This walkthrough is working analysis
+    only; your final answer is ONLY the Return Format below.
 
     ### 1. Cross-Slice Integration
 
@@ -117,6 +118,8 @@ Dispatch subagent of type general-purpose (use your subagent/task tool):
     NOT code-fix items.
 
     ## Return Format
+
+    Send only this as your final answer. Leave the analysis above out.
 
     **Strengths**
     - <cross-slice strengths backed by paths or commit refs>

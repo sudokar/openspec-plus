@@ -80,6 +80,8 @@ Dispatch subagent of type general-purpose (use your subagent/task tool):
     Do NOT batch, summarize, or assess silently — the per-section
     enumeration and per-item verdict MUST appear in your written output.
     Every item must be visited. Apply to both production and test code.
+    This walkthrough is working analysis only; your final answer is
+    ONLY the Return Format below.
 
     1. **Standard concerns:**
 
@@ -146,6 +148,8 @@ Dispatch subagent of type general-purpose (use your subagent/task tool):
     for every project-rule violation.
 
     ## Return Format
+
+    Send only this as your final answer. Leave the analysis above out.
 
     **Strengths**
     - <brief, specific strengths backed by file:line>
