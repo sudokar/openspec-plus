@@ -1,7 +1,7 @@
 ---
 name: openspec-plus-spec
 description: "MANDATORY skill that activates whenever the OpenSpec specification phase begins. Triggers: /opsx-new or /opsx-continue runs; openspec-new-change, openspec-continue-change, or openspec-explore is active; `openspec instructions spec` or `openspec instructions specs` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec specification."
-version: 1.2.0
+version: 1.3.0
 priority: high
 disable-user-invocation: true
 ---
@@ -23,8 +23,8 @@ Strengthen specification quality. Requirements complete, testable, unambiguous, 
 - "The user wants this quickly, I'll just write it"
 - "I surfaced these gaps in my reasoning, that counts"
 - "I'll list all my ambiguities in a table and ask the user to fill them in"
-- "I'll ask all questions at once so the user can answer in one message"
-- "These ambiguities are related so I'll group them into one question"
+- "I'll ask all questions at once so the user can answer in one message" (unless `settings.questionMode: batch` — then it's the documented procedure, not a shortcut)
+- "These ambiguities are related so I'll group them into one question" (outside configured `batch` mode)
 - "Free-form scenarios are clearer than Gherkin here"
 - "I should read the code to understand the context"
 - "The code I need to read is small, I'll just open it directly"
@@ -91,28 +91,22 @@ When dispatching explore subagent, prompt: "Describe the observable behavior of 
 
 Run FIRST, before any analysis:
 
-```bash
-openspec instructions specs --change <name> --json
-```
-
-(Use `spec` instead of `specs` if the schema names the artifact `spec` — check `openspec status --change <name>` for the artifact id.)
-
-Extract from response:
-- `template` — structural authority; sections you MUST fill
-- `instruction` — per-section guidance; what content each section needs
-- `rules` — project constraints to honor
-
-Parse template sections (H2/H3/H4 headers + HTML comments). These are your **information requirements**. Phase 1 analysis MUST collect enough substance to fill every template section. If the template has sections the 7-step analysis doesn't naturally cover, add targeted questions for them.
+1. Run:
+   ```bash
+   openspec instructions specs --change <name> --json
+   ```
+   (Use `spec` instead of `specs` if the schema names the artifact `spec` — check `openspec status --change <name>` for the artifact id.) Extract: `template` (structural authority; sections you MUST fill), `instruction` (per-section guidance; what content each section needs), `rules` (project constraints to honor). Parse template sections (H2/H3/H4 headers + HTML comments) — these are your **information requirements**; Phase 1 analysis MUST collect enough substance to fill every section. If the template has sections the 7-step analysis doesn't naturally cover, add targeted questions for them.
+2. Read `openspec/.plus/config.yaml` (missing/unreadable/unrecognized → defaults): `settings.questionMode` (`sequential` default; `batch` groups steps 3-7's questions into fewer rounds — see Phase 1 below).
 
 ---
 
 ## Phase 1: Interactive Analysis (MANDATORY)
 
-**Pre-existing answers:** If recent conversation already answered any analysis points (requirements, ambiguities, edge cases, stakeholder concerns, scenarios) — via prior exploration, a detailed initial request, or any other source — incorporate those into your analysis and SKIP the corresponding question. Ask ONE question at a time only for genuinely unresolved gaps. NEVER re-ask questions already answered.
+**Pre-existing answers:** If recent conversation already answered any analysis points (requirements, ambiguities, edge cases, stakeholder concerns, scenarios) — via prior exploration, a detailed initial request, or any other source — incorporate those into your analysis and SKIP the corresponding question. Ask ONE question at a time only for genuinely unresolved gaps (`batch` mode: collect steps 3-7's questions into as few rounds as possible instead — same real answers, no assumptions). NEVER re-ask questions already answered.
 
 Run every step. Where ambiguities or gaps require user decision, use **question tool** — one question at a time, with options. NEVER write any file during this phase.
 
-Always include your recommended answer with rationale on every question — never a bare question without a recommendation. If the user's answer introduces a new ambiguity or dependent decision, follow that branch before advancing to the next step or gap. A gap or ambiguity is only resolved when no sub-decision within it remains open. If a fact can be determined from existing artifacts, project files, or the environment, look it up — do not ask the user for discoverable information.
+Always include your recommended answer with rationale on every question — never a bare question without a recommendation. In `sequential` mode, if the user's answer introduces a new ambiguity or dependent decision, follow that branch before advancing to the next step or gap (`batch`: defer it to the next batch round instead). A gap or ambiguity is only resolved when no sub-decision within it remains open. If a fact can be determined from existing artifacts, project files, or the environment, look it up — do not ask the user for discoverable information.
 
 ## 1. Project Context
 
@@ -131,15 +125,15 @@ Extract all requirements from proposal (+ design if present). Normalize into cle
 
 ## 3. Completeness Analysis
 
-Look for gaps across user/system/admin/failure/integration flows. **Output:** gaps found, or "None found" explicitly. Gaps needing user decision → **question tool**, ONE at a time.
+Look for gaps across user/system/admin/failure/integration flows. **Output:** gaps found, or "None found" explicitly. Gaps needing user decision → **question tool**, ONE at a time (`batch`: joins the combined round with steps 4-7).
 
 ## 4. Ambiguity Analysis
 
-Identify terms with multiple interpretations. For each, use **question tool**: plain language framing, 3-4 concrete options, one "(Recommended)", ONE question at a time. NEVER batch or assume.
+Identify terms with multiple interpretations. For each, use **question tool**: plain language framing, 3-4 concrete options, one "(Recommended)", ONE question at a time. NEVER assume. In `sequential` mode never batch; in `batch` mode present these together with steps 3, 5, 6, 7's questions in as few rounds as the tool allows.
 
 ## 5. Edge Case Analysis
 
-Review: invalid input, missing data, permissions, concurrency, retries, partial failures. **Output:** uncovered edges, or "None found." Decisions → **question tool**, ONE at a time.
+Review: invalid input, missing data, permissions, concurrency, retries, partial failures. **Output:** uncovered edges, or "None found." Decisions → **question tool**, ONE at a time (`batch`: joins the combined round).
 
 ## 6. Stakeholder Review
 
@@ -166,7 +160,7 @@ Rules:
 
 Constructing scenarios surfaces ambiguity — a requirement that can't be expressed as Given/When/Then is not testable.
 
-For each requirement lacking a scenario, with ambiguous scenario, or contradictory scenarios, use **question tool**. ONE question at a time.
+For each requirement lacking a scenario, with ambiguous scenario, or contradictory scenarios, use **question tool**. ONE question at a time (`batch`: joins the combined round).
 
 ---
 
@@ -193,11 +187,11 @@ Once all answered, summarize resolved decisions:
 * List each ambiguity/gap and user's chosen answer
 * Confirm no open questions remain
 
-Explicitly ask the user to confirm shared understanding before proceeding to Phase 2. Do NOT advance on silence or implied agreement.
+In `sequential` mode, explicitly ask the user to confirm shared understanding before proceeding to Phase 2 — do NOT advance on silence or implied agreement. In `batch` mode, skip this extra question — the summary was already built from the user's combined replies; proceed to Phase 2.
 
-**Template coverage check:** Verify every template section (from Phase 0) has collected substance to fill it. If any section lacks substance, ask targeted questions until covered.
+**Template coverage check:** Verify every template section (from Phase 0) has collected substance to fill it. If any section lacks substance, ask targeted questions until covered (`batch`: combine into one round).
 
-**Rules compliance check:** Review `rules` from Phase 0. If any rule constrains what can be specified (e.g., "all requirements must have Gherkin scenarios", "edge cases must be explicitly documented"), verify the requirements honor those constraints. If a rule is violated, surface the conflict to the user before proceeding.
+**Rules compliance check:** Review `rules` from Phase 0. If any rule constrains what can be specified (e.g., "all requirements must have Gherkin scenarios", "edge cases must be explicitly documented"), verify the requirements honor those constraints. If a rule is violated, surface the conflict to the user before proceeding (`batch`: fold multiple conflicts into one round).
 
 Mark Phase 1 complete. Update task status. Proceed to Phase 2.
 

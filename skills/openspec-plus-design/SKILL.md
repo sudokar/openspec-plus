@@ -1,7 +1,7 @@
 ---
 name: openspec-plus-design
 description: "MANDATORY skill that activates whenever the OpenSpec design phase begins. Triggers: /opsx-new or /opsx-continue runs; openspec-new-change, openspec-continue-change, or openspec-explore is active; `openspec instructions design` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec design document."
-version: 1.4.0
+version: 1.5.0
 priority: high
 disable-user-invocation: true
 ---
@@ -70,7 +70,7 @@ Display workflow phases via task tool at start; update as each phase completes.
 
 - **Explore Before Converging** — never commit to first approach; always explore alternatives.
 - **User Owns The Final Direction** — model recommends, user decides.
-- **Build Design Collaboratively** — NEVER generate full design at once; build incrementally, review each section with user.
+- **Build Design Collaboratively** — in `sequential` mode, NEVER generate full design at once; build incrementally, review each section with user (`batch` mode: generate all, one consolidated review — see Phase 3).
 - **Design Before Documentation** — validate design (including alignment with proposal and any existing spec) before writing design.md.
 - **YAGNI — Complexity Must Be Justified** — every abstraction, layer, indirection MUST serve a real present need.
 - **Improve, Don't Refactor** — targeted improvements to existing code only when they serve the change; never propose unrelated refactoring.
@@ -97,22 +97,18 @@ Respect any approved-library list from project instruction files. Don't propose 
 
 Run FIRST, before any exploration:
 
-```bash
-openspec instructions design --change <name> --json
-```
-
-Extract from response:
-- `template` — structural authority; sections you MUST fill
-- `instruction` — per-section guidance; what content each section needs
-- `rules` — project constraints to honor
-
-Parse template sections (H2/H3 headers + HTML comments). These are your **information requirements**. Phase 3 design concerns MUST produce enough substance to fill every template section. If the template has sections the hardcoded 5+1 concerns don't cover, add dynamic concerns during Phase 3.
+1. Run:
+   ```bash
+   openspec instructions design --change <name> --json
+   ```
+   Extract: `template` (structural authority; sections you MUST fill), `instruction` (per-section guidance; what content each section needs), `rules` (project constraints to honor). Parse template sections (H2/H3 headers + HTML comments) — these are your **information requirements**; Phase 3 design concerns MUST produce enough substance to fill every section. If the template has sections the hardcoded 5+1 concerns don't cover, add dynamic concerns during Phase 3.
+2. Read `openspec/.plus/config.yaml` (missing/unreadable/unrecognized → defaults): `settings.questionMode` (`sequential` default; `batch` groups Phase 1/Library Resolution questions and collapses Phase 3 into one generate-all-then-review round — see Phase 1 and Phase 3 below).
 
 ---
 
 ## Phase 1: Explore Design Approaches
 
-**Pre-existing answers:** If recent conversation already covers architectural decisions, approaches discussed, constraints noted, or integration seams — via prior exploration, a detailed initial request, or any other source — incorporate those into your analysis and SKIP redundant clarification. Ask ONE question at a time only for genuinely unresolved areas. NEVER re-ask questions already answered in recent conversation.
+**Pre-existing answers:** If recent conversation already covers architectural decisions, approaches discussed, constraints noted, or integration seams — via prior exploration, a detailed initial request, or any other source — incorporate those into your analysis and SKIP redundant clarification. Ask ONE question at a time only for genuinely unresolved areas (`batch` mode: present all unresolved areas together instead — same rule as proposal's Phase 1). NEVER re-ask questions already answered in recent conversation.
 
 ## Project Context
 
@@ -128,7 +124,7 @@ Proposal answered "why" + capabilities. Spec (if present) answered "what". Proje
 
 If no spec exists and you find yourself defining detailed requirements, STOP — that's spec-phase work.
 
-Identify: architectural decisions that must be made and areas where multiple solutions exist. If a fact can be determined from code, project files, or existing artifacts, look it up — do not ask the user for discoverable information. For decisions that genuinely require user input, use question tool — ONE question at a time, never batch, always with your recommended answer and rationale. If the user's answer introduces a dependent decision or leaves a branch unresolved, follow it before advancing. Do not generate approaches until all pre-approach decisions are resolved.
+Identify: architectural decisions that must be made and areas where multiple solutions exist. If a fact can be determined from code, project files, or existing artifacts, look it up — do not ask the user for discoverable information. For decisions that genuinely require user input, use question tool — ONE question at a time in `sequential` mode (default), always with your recommended answer and rationale; in `batch` mode, present all genuinely-required decisions together, one combined reply. If the user's answer introduces a dependent decision or leaves a branch unresolved, follow it before advancing (`batch`: next batch round). Do not generate approaches until all pre-approach decisions are resolved.
 
 Generate TWO OR THREE viable design approaches (two when only two meaningful directions exist; three when three materially different solutions exist; never invent a weak approach). Each approach MUST satisfy proposal capabilities and spec (if present). For each provide: Approach Name, Core Idea, Advantages, Disadvantages, Complexity Level, Key Assumptions. Approaches must be meaningfully different — no cosmetic variations.
 
@@ -156,25 +152,27 @@ Mark Phase 2 complete. Update task status.
 
 ## Library Resolution (before Phase 3)
 
-With the approach selected, identify every component that may require a new library (parsing, validation, HTTP, auth, crypto, queuing, scheduling, etc.). For each, apply Use Stable Libraries Before Custom: survey 2-3 candidates, evaluate, surface recommended choice + rationale via question tool, wait for approval. Do NOT begin Phase 3 until all new library choices are approved. Already-installed libraries do not need re-approval. No new libraries → proceed immediately.
+With the approach selected, identify every component that may require a new library (parsing, validation, HTTP, auth, crypto, queuing, scheduling, etc.). For each, apply Use Stable Libraries Before Custom: survey 2-3 candidates, evaluate, surface recommended choice + rationale via question tool, wait for approval — one library per question in `sequential` mode, all libraries together in one round in `batch` mode. Do NOT begin Phase 3 until all new library choices are approved. Already-installed libraries do not need re-approval. No new libraries → proceed immediately.
 
 ---
 
 ## Phase 3: Build Design Sections
 
-After direction selected, build incrementally. NEVER generate full design at once. Generate ONE section at a time. Scale each section to its complexity — simple concerns need a few sentences, complex ones several paragraphs; length serves clarity, never appearance of rigor.
+After direction selected, build incrementally. In `sequential` mode (default), NEVER generate full design at once — generate ONE section at a time. Scale each section to its complexity — simple concerns need a few sentences, complex ones several paragraphs; length serves clarity, never appearance of rigor.
 
 After each section, ask via question tool: `Does this section look correct? A. Continue (Recommended) | B. Revise Section | C. Revisit Design Direction` — wait for response before proceeding.
+
+In `batch` mode: generate ALL sections up front (same rigor, concerns 1-7 all still fully worked through), then ask ONE consolidated question: `Continue (Recommended) | Revise section(s) — specify which | Revisit Design Direction`. Revision regenerates only the flagged section(s), re-presented for one more consolidated approval.
 
 ---
 
 ## Design Section Rules
 
-Phase 3 "sections" are DESIGN CONCERNS walked one at a time with user approval — NOT the same as template sections (Phase 0). Phase 4 maps concerns into template sections.
+Phase 3 "sections" are DESIGN CONCERNS, all worked through in substance regardless of mode — approval is per-concern in `sequential`, one consolidated approval in `batch` (see Phase 3) — NOT the same as template sections (Phase 0). Phase 4 maps concerns into template sections.
 
 ### Concrete Design Concerns (Phase 3 walk-through)
 
-Five + one conditional + one mandatory. Walk through each, get approval. Skip only if genuinely N/A.
+Five + one conditional + one mandatory. Walk through each — approval per concern (`sequential`) or one consolidated approval (`batch`). Skip only if genuinely N/A.
 
 1. **Architecture** — shape, layers, boundaries, external integration points
 2. **Component Structure** — units, responsibilities, interfaces
@@ -236,9 +234,9 @@ Don't continue until conflict resolved.
 
 ## Section Completion
 
-Continue ONE section at a time until all required sections reviewed and accepted.
+In `sequential` mode, continue ONE section at a time until all required sections reviewed and accepted (`batch`: all generated up front, one consolidated approval — see Phase 3).
 
-**Rules compliance check:** Review `rules` from Phase 0. If any rule constrains design choices (e.g., "testing approach section is mandatory", "migration plan required for breaking changes"), verify the design sections honor those constraints. If a rule is violated, surface the conflict to the user before proceeding.
+**Rules compliance check:** Review `rules` from Phase 0. If any rule constrains design choices (e.g., "testing approach section is mandatory", "migration plan required for breaking changes"), verify the design sections honor those constraints. If a rule is violated, surface the conflict to the user before proceeding (`batch`: fold multiple conflicts into one round).
 
 Mark Phase 3 complete. Update task status.
 
@@ -360,6 +358,6 @@ Implementation plans, WBS, estimates, code, deployment → later phases. Detaile
 
 ## Success Criteria
 
-**Succeeds:** alternatives explored, tradeoffs considered, recommendation provided, user selected, sections reviewed individually, reviewer dispatched once with findings applied, design at architecture level.
+**Succeeds:** alternatives explored, tradeoffs considered, recommendation provided, user selected, every concern approved (per-section in `sequential`, consolidated in `batch`), reviewer dispatched once with findings applied, design at architecture level.
 
-**Fails:** alternatives/selection/section-review skipped, full design at once, reviewer skipped/re-dispatched, requirements or implementation planning appears.
+**Fails:** alternatives/selection/concern-approval skipped, full design generated with no approval gate at all, reviewer skipped/re-dispatched, requirements or implementation planning appears.

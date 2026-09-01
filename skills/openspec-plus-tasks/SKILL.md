@@ -1,7 +1,7 @@
 ---
 name: openspec-plus-tasks
 description: "MANDATORY skill that activates whenever the OpenSpec tasks phase begins. Triggers: /opsx-new or /opsx-continue runs; openspec-new-change, openspec-continue-change, or openspec-explore is active; `openspec instructions tasks` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec tasks.md file."
-version: 1.3.0
+version: 1.4.0
 priority: high
 disable-user-invocation: true
 ---
@@ -79,22 +79,18 @@ Display workflow phases via task tool at start; update as each phase completes.
 
 Run FIRST, before any slicing:
 
-```bash
-openspec instructions tasks --change <name> --json
-```
-
-Extract from response:
-- `template` — structural authority; format you MUST follow
-- `instruction` — guidance on what content each section needs
-- `rules` — project constraints to honor
-
-Parse template structure. If the template includes metadata fields (priority, effort, labels, categories) beyond the default `## N. Name` + `- [ ] N.M desc` format, Phase 1 must collect that information during slicing. Discovery questions MUST satisfy template requirements.
+1. Run:
+   ```bash
+   openspec instructions tasks --change <name> --json
+   ```
+   Extract: `template` (structural authority; format you MUST follow), `instruction` (guidance on what content each section needs), `rules` (project constraints to honor). Parse template structure — if it includes metadata fields (priority, effort, labels, categories) beyond the default `## N. Name` + `- [ ] N.M desc` format, Phase 1 must collect that information during slicing; discovery questions MUST satisfy template requirements.
+2. Read `openspec/.plus/config.yaml` (missing/unreadable/unrecognized → defaults): `settings.questionMode` (`sequential` default; `batch` groups step 5's clarifying questions into one round — see Phase 1 below).
 
 ---
 
 ## Phase 1: Pre-Write Discovery & Vertical Slicing (MANDATORY)
 
-**Pre-existing answers:** If recent conversation already identifies vertical slices, names testable outcomes, or establishes dependency ordering — via prior exploration, a detailed initial request, or any other source — incorporate those and SKIP redundant clarification. Ask ONE question at a time only for unresolved slicing decisions. NEVER re-ask what's already established.
+**Pre-existing answers:** If recent conversation already identifies vertical slices, names testable outcomes, or establishes dependency ordering — via prior exploration, a detailed initial request, or any other source — incorporate those and SKIP redundant clarification. Ask ONE question at a time only for unresolved slicing decisions (`batch` mode: present them together instead — see step 5). NEVER re-ask what's already established.
 
 ### 1. Read Inputs
 
@@ -129,11 +125,13 @@ If slicing is ambiguous, use **question tool**, ONE question at a time:
 * "Which capability should be the first vertical slice?"
 * "Is X part of slice A, or its own slice?"
 
-NEVER batch. NEVER assume. Always include your recommended slice boundary with rationale on every question — never a bare question without a recommendation. If the user's answer raises a follow-on slicing decision, resolve that branch before moving on.
+In `sequential` mode (default), NEVER batch. NEVER assume. Always include your recommended slice boundary with rationale on every question — never a bare question without a recommendation. If the user's answer raises a follow-on slicing decision, resolve that branch before moving on (`batch`: next batch round).
+
+In `batch` mode (`settings.questionMode: batch`), present all unresolved slicing questions together in one round instead — same real answers and recommendations.
 
 ### 6. Rules Compliance Check
 
-Review `rules` from Phase 0. If any rule constrains task breakdown, verify the slices honor those constraints. If a rule is violated, surface the conflict to the user before proceeding.
+Review `rules` from Phase 0. If any rule constrains task breakdown, verify the slices honor those constraints. If a rule is violated, surface the conflict to the user before proceeding (`batch`: fold multiple conflicts into one round).
 
 Mark Phase 1 complete. Update task status. Proceed to Phase 2.
 
