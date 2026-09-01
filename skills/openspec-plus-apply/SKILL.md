@@ -1,7 +1,7 @@
 ---
 name: openspec-plus-apply
 description: "MANDATORY skill that activates whenever the OpenSpec apply phase begins. Triggers: /opsx-apply runs, the openspec-apply-change vanilla skill is referenced or active, `openspec instructions apply` is invoked, or the user asks to implement, apply, execute, or build out an OpenSpec change ('implement the change', 'apply tasks', 'execute change', 'build out the change'). Takes over only vanilla step 6 (implementation loop) and emulates step 7 output (final status)."
-version: 1.2.1
+version: 1.3.0
 priority: high
 disable-user-invocation: true
 ---
@@ -25,7 +25,7 @@ This skill takes over Step 6 only.
 
 ---
 
-> **RIGID. NEVER skip Phase 0 mode question. NEVER read affected source code files into the main agent's context — pass PATHS to subagents who read them. NEVER mark a slice `[x]` while a relevant test is failing or skipped. NEVER run code-quality review before spec-compliance ✅. NEVER dispatch parallel implementer subagents within a change without dependency analysis + user confirmation. NEVER modify spec/design from inside the implementer — escalate to plus-design / plus-spec. NEVER commit code. NEVER take over vanilla steps 1-5 or invoke openspec-verify-change or auto-trigger /opsx-archive.**
+> **RIGID. NEVER skip Phase 0 mode question when `settings.apply.executionMode` is `ask`. NEVER read affected source code files into the main agent's context — pass PATHS to subagents who read them. NEVER mark a slice `[x]` while a relevant test is failing or skipped. NEVER run code-quality review before spec-compliance ✅. NEVER dispatch parallel implementer subagents within a change without dependency analysis + user confirmation. NEVER modify spec/design from inside the implementer — escalate to plus-design / plus-spec. NEVER commit code. NEVER take over vanilla steps 1-5 or invoke openspec-verify-change or auto-trigger /opsx-archive.**
 
 **Red flags — STOP, you are about to violate this skill:**
 
@@ -144,6 +144,10 @@ Apply in every slice:
 
 ## Phase 0: Pre-Flight
 
+### 0.0 Resolve Apply Config
+
+Read `openspec/.plus/config.yaml` once (missing/unreadable/unrecognized value → default, zero behavior change): `settings.apply.executionMode` (`ask` default | `subagent` | `inline`, anything else → `ask` — skips 0.3 only for `subagent`/`inline`), `settings.apply.parallelism` (`ask` default | `always` | `never`, anything else → `ask` — skips 1.4 only for `always`/`never`).
+
 ### 0.1 Verify In-Context Artifacts
 
 Confirm vanilla's steps 2-4 produced these in conversation context:
@@ -178,7 +182,9 @@ Missing or ambiguous → ask user ONCE via question tool.
 
 ### 0.3 Mode Question (MANDATORY, blocking)
 
-Use question tool with ONE question. **Subagent mode is the recommended default for ALL changes — small, medium, and large.** Inline mode exists only as a fallback for environments where subagent dispatch is unavailable. Phrase the question so this preference is unmistakable.
+If `settings.apply.executionMode` ≠ `ask` (from 0.0), skip this question — use the configured mode directly, state it in one line, proceed to Phase 1.
+
+Otherwise, use question tool with ONE question. **Subagent mode is the recommended default for ALL changes — small, medium, and large.** Inline mode exists only as a fallback for environments where subagent dispatch is unavailable. Phrase the question so this preference is unmistakable.
 
 ```text
 How should the change be implemented?
@@ -237,6 +243,8 @@ Slices A, B parallelizable when:
 * Disjoint affected-file sets
 
 ### 1.4 Ask About Parallelism (only if independent group exists)
+
+If `settings.apply.parallelism` ≠ `ask` (from 0.0), skip this question — `always` dispatches all independent groups in parallel, `never` runs sequentially, without asking.
 
 ```text
 Slices [A, B, ...] appear independent (no shared files, no dependency

@@ -12,6 +12,7 @@
 
 <p align="center">
   <a href="#-install--update">⚡ Install / Update</a> &bull;
+  <a href="#config">⚙️ Configuration</a> &bull;
   <a href="#-manual-installation">🔧 Manual Setup</a> &bull;
   <a href="CHANGELOG.md">📝 Changelog</a>
 </p>
@@ -19,7 +20,7 @@
 <p align="center">
   <a href="https://github.com/sudokar/openspec-plus/stargazers"><img src="https://img.shields.io/github/stars/sudokar/openspec-plus?style=social" alt="GitHub Stars" /></a>
   &nbsp;
-  <img src="https://img.shields.io/badge/version-1.4.1-blue" alt="Version" />
+  <img src="https://img.shields.io/badge/version-1.5.0-blue" alt="Version" />
   &nbsp;
   <img src="https://img.shields.io/github/license/sudokar/openspec-plus" alt="License" />
 </p>
@@ -100,7 +101,8 @@ Step 3 — Download from GitHub
 Download the repository https://github.com/sudokar/openspec-plus to a temporary
 location. Use whatever method is available to you (`git clone --depth 1`,
 `gh repo clone`, `curl`, direct file download, etc.). You only need the `skills/`
-directory, `VERSION` file, and `openspec/config.yaml` from the repository.
+directory, `VERSION` file, `openspec/config.yaml`, and `openspec/.plus/config.yaml`
+from the repository.
 
 Step 4 — Install skills and VERSION file
 
@@ -131,16 +133,32 @@ Check if `openspec/config.yaml` exists in the current project:
   - Do NOT remove or modify any existing content in the user's config.yaml.
     Only add what is missing.
 
-Step 6 — Clean up
+Step 6 — Merge openspec/.plus/config.yaml
+
+Check if `openspec/.plus/config.yaml` exists in the current project:
+
+- If it does NOT exist: copy the downloaded `openspec/.plus/config.yaml` as-is
+  to `openspec/.plus/config.yaml` in the current project. Create the
+  `openspec/.plus/` directory if it does not exist.
+- If it DOES exist: deep-merge by key path (this file nests scalars under
+  `settings.*`, `settings.apply.*` — not arrays, so this is a different merge shape
+  than Step 5's array-append):
+  for each key path present in the downloaded file but absent from the
+  existing one, add it with the downloaded default value. Do NOT overwrite,
+  remove, or modify any key the existing file already has, even if its value
+  differs from the new default — the user may have deliberately customized it.
+
+Step 7 — Clean up
 
 Remove the temporary download directory.
 
-Step 7 — Summary report
+Step 8 — Summary report
 
 Provide a brief summary with:
 - The skills directory used
 - How many skills were installed (noting how many were new vs updated)
 - Whether config.yaml was created, merged, or left unchanged
+- Whether openspec/.plus/config.yaml was created, merged (how many new keys), or left unchanged
 
 Keep the summary concise — no line-by-line breakdown.
 
@@ -161,6 +179,32 @@ The fastest way to feel the value is to run it on something you're actually buil
 
 ---
 
+<a id="config"></a>
+
+## ⚙️ Configuration
+
+Tune behavior via `openspec/.plus/config.yaml` (separate from OpenSpec's own `openspec/config.yaml`; installed/updated automatically per the steps above). Every key is optional — omit any of them for today's default behavior:
+
+```yaml
+settings:
+  questionMode: sequential   # sequential (default) | batch
+
+  autoUpdateCheck: true        # true (default) | false
+
+  apply:
+    executionMode: ask          # ask (default) | subagent | inline
+    parallelism: ask             # ask (default) | always | never
+```
+
+| Key | Effect |
+|---|---|
+| `questionMode: batch` | Proposal/design/spec/tasks group each phase's questions into as few question-tool rounds as possible instead of one at a time — same real answers, no assumptions, just fewer round trips. Most valuable for per-prompt-priced model providers, especially premium/high-tier models where each round trip is expensive. Config-only, no conversational trigger. |
+| `autoUpdateCheck: false` | Skips proposal's weekly version check + upgrade question entirely — useful offline or on network-restricted setups. |
+| `apply.executionMode` | Set to `subagent` or `inline` to skip apply's Subagent-vs-Inline question every run. |
+| `apply.parallelism` | Set to `always` or `never` to skip apply's parallel-dispatch question. |
+
+---
+
 ## 🔄 Stay Updated
 
 OpenSpec Plus improves continuously. Here's how to stay in the loop:
@@ -168,7 +212,7 @@ OpenSpec Plus improves continuously. Here's how to stay in the loop:
 - ⭐ **Star this repo** — helps others discover it and bookmarks it for
   you: [sudokar/openspec-plus](https://github.com/sudokar/openspec-plus)
 - 🔔 **Auto-check** *(recommended)* — skills automatically check for updates weekly and notify you in-session; just
-  re-run the install prompt when prompted
+  re-run the install prompt when prompted (disable via `settings.autoUpdateCheck: false`, see [Configuration](#-configuration))
 - 👁️ **GitHub Watch** — click **Watch → Custom → Pull requests** to get notified when new features ship
 - 📝 **Changelog** — check [CHANGELOG.md](CHANGELOG.md) periodically to see what's new
 
@@ -195,7 +239,14 @@ If you prefer not to use the AI prompt:
    # Manually add the context and rules entries to your existing config.yaml
    ```
 
-4. Clean up:
+4. Install or merge `openspec/.plus/config.yaml` (OpenSpec Plus's own settings — see [Configuration](#-configuration)):
+   ```bash
+   mkdir -p openspec/.plus
+   test -f openspec/.plus/config.yaml || cp /tmp/openspec-plus/openspec/.plus/config.yaml openspec/.plus/config.yaml
+   # File already existed? Add only missing keys by hand — never overwrite
+   ```
+
+5. Clean up:
    ```bash
    rm -rf /tmp/openspec-plus
    ```

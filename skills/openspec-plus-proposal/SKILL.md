@@ -1,7 +1,7 @@
 ---
 name: openspec-plus-proposal
 description: "MANDATORY skill that activates whenever the OpenSpec proposal phase begins. Triggers: /opsx-new or /opsx-continue runs; openspec-new-change, openspec-continue-change, or openspec-explore is active; `openspec instructions proposal` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec proposal."
-version: 1.3.0
+version: 1.4.0
 priority: high
 disable-user-invocation: true
 ---
@@ -57,7 +57,10 @@ Display workflow phases via task tool at start; update as each phase completes.
 
 **Run FIRST, before Phase 0. Skip if already run this session.**
 
-1. Read `openspec/.plus/last-update-check`:
+1. Read `openspec/.plus/config.yaml`:
+   - `settings.autoUpdateCheck` is `false` → **skip Phase -1 entirely, proceed to Phase 0**
+   - Missing/unreadable, or not `false` → continue
+2. Read `openspec/.plus/last-update-check`:
    - File exists AND timestamp is within 7 days of today → **skip immediately, proceed to Phase 0**
    - Missing or older than 7 days → continue:
      - Fetch `https://raw.githubusercontent.com/sudokar/openspec-plus/main/VERSION`
@@ -69,7 +72,7 @@ Display workflow phases via task tool at start; update as each phase completes.
        - If user selects **Upgrade** → display the install/update link: `https://github.com/sudokar/openspec-plus#-install--update` and STOP. Do NOT continue to Phase 0 — the user should run the install/update prompt first and restart the session.
        - If user selects **Upgrade later** → proceed to Phase 0 normally.
      - Write current timestamp to `openspec/.plus/last-update-check`
-2. Network/file errors → silently continue. NEVER block the workflow for network issues — proceed to Phase 0.
+3. Network/file errors → silently continue. NEVER block the workflow for network issues — proceed to Phase 0.
 
 Mark Phase -1 complete, proceed to Phase 0.
 
@@ -79,22 +82,18 @@ Mark Phase -1 complete, proceed to Phase 0.
 
 Run FIRST (after Phase -1), before any questions:
 
-```bash
-openspec instructions proposal --change <name> --json
-```
-
-Extract from response:
-- `template` — structural authority; sections you MUST fill
-- `instruction` — per-section guidance; what content each section needs
-- `rules` — project constraints to honor
-
-Parse template sections (H2/H3 headers + HTML comments). These are your **information requirements**. Every template section = information you MUST collect during Phase 1. If a section needs data the five lenses don't cover, add questions for it.
+1. Run:
+   ```bash
+   openspec instructions proposal --change <name> --json
+   ```
+   Extract: `template` (structural authority; sections you MUST fill), `instruction` (per-section guidance; what content each section needs), `rules` (project constraints to honor). Parse template sections (H2/H3 headers + HTML comments) — these are your **information requirements**; every section = information you MUST collect during Phase 1. If a section needs data the five lenses don't cover, add questions for it.
+2. Read `openspec/.plus/config.yaml` (missing/unreadable/unrecognized → defaults): `settings.questionMode` (`sequential` default; `batch` groups Phase 1's five lenses into fewer question-tool rounds instead of one at a time).
 
 ---
 
 ## Phase 1: Interactive Discovery
 
-**Pre-existing answers:** If recent conversation already answers any of the five lenses (Problem & Why, Goals, Scope & Capabilities, Non-Goals, Impact) — via prior exploration, a detailed initial request, or any other source — state the resolved answer in your analysis and SKIP that lens's question. Ask ONE question at a time only for unresolved or partial lenses. NEVER re-ask answered questions.
+**Pre-existing answers:** If recent conversation already answers any of the five lenses (Problem & Why, Goals, Scope & Capabilities, Non-Goals, Impact) — via prior exploration, a detailed initial request, or any other source — state the resolved answer in your analysis and SKIP that lens's question. Ask ONE question at a time only for unresolved or partial lenses (`batch` mode: present all unresolved lenses together instead — see below). NEVER re-ask answered questions.
 
 Read in this order:
 
@@ -113,18 +112,20 @@ Use the **question tool**, ONE question at a time. Cover these lenses until each
 4. **Non-Goals** — what is explicitly NOT in scope; scope creep to prevent
 5. **Impact** — affected systems, files, teams, or workflows
 
-NEVER batch questions. NEVER assume answers. Always include your recommended answer with rationale on every question — never a bare question without a recommendation.
+In `sequential` mode (default), NEVER batch questions. NEVER assume answers. Always include your recommended answer with rationale on every question — never a bare question without a recommendation.
 
-If the user's answer introduces a new decision point or leaves something partially unresolved, follow that branch with a targeted follow-up before advancing to the next lens. A lens is fully resolved only when no dependent decision within it remains open.
+**`batch` mode** (`settings.questionMode: batch`): present all unresolved lenses together — one question-tool call per lens up to its multi-question cap, or one combined numbered message if the tool allows only one question per call. Wait for one combined reply; map answers back by lens. Same real answers and recommendations as `sequential` — never skip or assume a lens.
+
+If the user's answer introduces a new decision point or leaves something partially unresolved, follow that branch with a targeted follow-up before advancing to the next lens (in `batch` mode, defer the follow-up to the next batch round). A lens is fully resolved only when no dependent decision within it remains open.
 
 If a fact can be determined from existing artifacts, project files, or the environment, look it up — do not ask the user for discoverable information.
 
-Once all five lenses answered, summarize for the user: problem (one sentence), outcome (one sentence), in-scope capabilities, non-goals, impact areas. Explicitly ask the user to confirm shared understanding before proceeding to Phase 2. Do NOT advance on silence or implied agreement.
+Once all five lenses answered, summarize for the user: problem (one sentence), outcome (one sentence), in-scope capabilities, non-goals, impact areas. In `sequential` mode, explicitly ask the user to confirm shared understanding before proceeding to Phase 2 — do NOT advance on silence or implied agreement. In `batch` mode, skip this extra question — the summary was already built from the user's one combined reply; proceed to Phase 2.
 
 **Phase 1 Complete Checks:**
 - **Mid-discovery scope check:** re-evaluate — did scope grow beyond a single cohesive change during Q&A? If so, decompose before writing.
-- **Template coverage check:** verify every template section (from Phase 0) has collected substance to fill it; ask targeted questions if any section lacks substance.
-- **Rules compliance check:** review `rules` from Phase 0; if any rule constrains what can be proposed, surface the conflict to the user before writing.
+- **Template coverage check:** verify every template section (from Phase 0) has collected substance to fill it; ask targeted questions if any section lacks substance (`batch`: combine into one round).
+- **Rules compliance check:** review `rules` from Phase 0; if any rule constrains what can be proposed, surface the conflict to the user before writing (`batch`: fold multiple conflicts into one round).
 
 ---
 
