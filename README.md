@@ -203,8 +203,6 @@ settings:
 | `apply.executionMode` | Set to `subagent` or `inline` to skip apply's Subagent-vs-Inline question every run. |
 | `apply.parallelism` | Set to `always` or `never` to skip apply's parallel-dispatch question. |
 
-`questionMode` has no conversational trigger by design: Fast-Forward's old keyword detection (v1.4.1) was removed upstream because ordinary conversation could accidentally fire it across shared skills — `batch` only activates via this config file, and still asks every question with real answers, never assumptions.
-
 ---
 
 ## 🔄 Stay Updated
