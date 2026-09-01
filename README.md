@@ -12,7 +12,7 @@
 
 <p align="center">
   <a href="#-install--update">⚡ Install / Update</a> &bull;
-  <a href="#configuration">Configuration</a> &bull;
+  <a href="#config">⚙️ Configuration</a> &bull;
   <a href="#-manual-installation">🔧 Manual Setup</a> &bull;
   <a href="CHANGELOG.md">📝 Changelog</a>
 </p>
@@ -179,7 +179,9 @@ The fastest way to feel the value is to run it on something you're actually buil
 
 ---
 
-## Configuration
+<a id="config"></a>
+
+## ⚙️ Configuration
 
 Tune behavior via `openspec/.plus/config.yaml` (separate from OpenSpec's own `openspec/config.yaml`; installed/updated automatically per the steps above). Every key is optional — omit any of them for today's default behavior:
 
