@@ -1,9 +1,10 @@
 ---
 name: openspec-plus-proposal
 description: "MANDATORY skill that activates whenever the OpenSpec proposal phase begins. Triggers: /opsx-new or /opsx-continue runs; openspec-new-change, openspec-continue-change, or openspec-explore is active; `openspec instructions proposal` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec proposal."
-version: 1.4.0
-priority: high
-disable-user-invocation: true
+metadata:
+  version: 1.6.0
+  priority: high
+  disable-user-invocation: true
 ---
 
 # OpenSpec Plus Proposal
@@ -63,8 +64,8 @@ Display workflow phases via task tool at start; update as each phase completes.
 2. Read `openspec/.plus/last-update-check`:
    - File exists AND timestamp is within 7 days of today → **skip immediately, proceed to Phase 0**
    - Missing or older than 7 days → continue:
-     - Fetch `https://raw.githubusercontent.com/sudokar/openspec-plus/main/VERSION`
-     - Compare with `openspec/.plus/VERSION` (local)
+     - Fetch `https://api.github.com/repos/sudokar/openspec-plus/releases/latest` (single JSON object). Read the `tag_name` field and strip the leading `v` if present. This is the remote version.
+     - Compare remote version with `openspec/.plus/VERSION` (local)
      - If remote > local → **prompt the user** using the question tool:
        > 🔔 OpenSpec Plus **v{remote}** is available (you have **v{local}**).
        - Option 1: **Upgrade (Recommended)**

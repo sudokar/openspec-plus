@@ -1,9 +1,10 @@
 ---
 name: openspec-plus-tasks
 description: "MANDATORY skill that activates whenever the OpenSpec tasks phase begins. Triggers: /opsx-new or /opsx-continue runs; openspec-new-change, openspec-continue-change, or openspec-explore is active; `openspec instructions tasks` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec tasks.md file."
-version: 1.4.0
-priority: high
-disable-user-invocation: true
+metadata:
+  version: 1.6.0
+  priority: high
+  disable-user-invocation: true
 ---
 
 # OpenSpec Plus Tasks

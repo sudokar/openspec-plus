@@ -1,9 +1,10 @@
 ---
 name: openspec-plus-spec
 description: "MANDATORY skill that activates whenever the OpenSpec specification phase begins. Triggers: /opsx-new or /opsx-continue runs; openspec-new-change, openspec-continue-change, or openspec-explore is active; `openspec instructions spec` or `openspec instructions specs` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec specification."
-version: 1.3.0
-priority: high
-disable-user-invocation: true
+metadata:
+  version: 1.6.0
+  priority: high
+  disable-user-invocation: true
 ---
 
 # OpenSpec Plus Spec

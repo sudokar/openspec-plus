@@ -5,6 +5,15 @@ All notable changes to OpenSpec Plus will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-09-02
+
+### Changed
+- Skills frontmatter restructured: `version`, `priority`, and `disable-user-invocation` moved under `metadata` section per [agentskills.io specification](https://agentskills.io/specification#skill-md-format)
+- All skill versions unified to `1.6.0` (release version)
+- Proposal skill auto-update check now uses GitHub Releases API (`/releases/latest`) instead of fetching the VERSION file — removes dependency on VERSION file location
+
+---
+
 ## [1.5.0] - 2026-08-30
 
 ### Added

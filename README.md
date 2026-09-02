@@ -20,7 +20,7 @@
 <p align="center">
   <a href="https://github.com/sudokar/openspec-plus/stargazers"><img src="https://img.shields.io/github/stars/sudokar/openspec-plus?style=social" alt="GitHub Stars" /></a>
   &nbsp;
-  <img src="https://img.shields.io/badge/version-1.5.0-blue" alt="Version" />
+  <img src="https://img.shields.io/badge/version-1.6.0-blue" alt="Version" />
   &nbsp;
   <img src="https://img.shields.io/github/license/sudokar/openspec-plus" alt="License" />
 </p>

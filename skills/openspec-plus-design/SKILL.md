@@ -1,9 +1,10 @@
 ---
 name: openspec-plus-design
 description: "MANDATORY skill that activates whenever the OpenSpec design phase begins. Triggers: /opsx-new or /opsx-continue runs; openspec-new-change, openspec-continue-change, or openspec-explore is active; `openspec instructions design` is invoked; or the user wants to create, update, review, refine, or discuss an OpenSpec design document."
-version: 1.5.0
-priority: high
-disable-user-invocation: true
+metadata:
+  version: 1.6.0
+  priority: high
+  disable-user-invocation: true
 ---
 
 # OpenSpec Plus Design
