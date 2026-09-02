@@ -1,9 +1,10 @@
 ---
 name: openspec-plus-apply
 description: "MANDATORY skill that activates whenever the OpenSpec apply phase begins. Triggers: /opsx-apply runs, the openspec-apply-change vanilla skill is referenced or active, `openspec instructions apply` is invoked, or the user asks to implement, apply, execute, or build out an OpenSpec change ('implement the change', 'apply tasks', 'execute change', 'build out the change'). Takes over only vanilla step 6 (implementation loop) and emulates step 7 output (final status)."
-version: 1.3.0
-priority: high
-disable-user-invocation: true
+metadata:
+  version: 1.6.0
+  priority: high
+  disable-user-invocation: true
 ---
 
 # OpenSpec Plus Apply
