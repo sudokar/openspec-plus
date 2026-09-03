@@ -167,7 +167,7 @@ Recommend the user to restart their code editor or coding agent for the skills t
 
 ---
 
-## ⚡ First Steps After Install
+## 🚀 First Steps After Install
 
 Once installed and your agent restarted, try it on a real change right away:
 
